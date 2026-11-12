@@ -32,10 +32,12 @@ app/                    ROOT WEB: semua yang di-deploy ada di sini
   js/state.js           Penyimpanan (localStorage) + ekspor data
   js/audio.js           Musik latar generatif, efek suara, narasi (TTS)
   js/ui.js              Helper DOM, toast, modal skala beban kognitif, visual SVG
+  js/maskot.js          Maskot 4 siswa (SVG buatan sendiri) + animasi CSS, disentuh → melompat
+  js/games/*.js         Games: balon (Balon Pola), katak (Lompat Katak), susun (Menara Angka), umum
   js/generator.js       Pembuat soal latihan acak
   js/data/materi.js     Konten materi per unit (kartu)
   js/data/literasi.js   Masalah literasi matematika
-  js/views/*.js         Satu file per halaman (beranda, materi, latihan, kuis, literasi, saya)
+  js/views/*.js         Satu file per halaman (beranda, materi, latihan, kuis, literasi, games, saya)
   data/bank-soal.json   DIBUAT OLEH python/generate_bank_soal.py (jangan edit manual)
   icons/                DIBUAT OLEH python/buat_ikon.py
 python/
@@ -73,8 +75,20 @@ Setiap fitur atau konten baru harus lolos daftar periksa ini:
 6. **Hindari split-attention**: label langsung di visual, bukan di legenda terpisah.
 7. **Hindari redundansi**: narasi membacakan teks kartu; jangan tambah teks lain yang mengulang.
 8. **Modalitas**: narasi suara tersedia, tetapi tidak dipaksa.
-9. **Tanpa batas waktu** di kuis/latihan; jangan menambah elemen dekoratif yang bergerak.
+9. **Tanpa batas waktu** di kuis/latihan. Animasi dekoratif (maskot, konfeti) **hanya** di Beranda,
+   Games, dan layar selesai. **Jangan** di kartu materi atau soal. Animasi bisa dimatikan
+   (Saya → Animasi maskot) dan otomatis mati bila `prefers-reduced-motion`.
 10. **Umpan balik langsung** dan menjelaskan *mengapa*, bukan hanya benar/salah.
+
+## Tema Visual & Suara
+
+- Tema ceria pink–ungu: token `--grad`, `--pink`, `--ungu`, `--primary` di `:root` (`css/style.css`).
+  Warna sinyal a/b/n/Uₙ tetap dipertahankan (jangan diganti dengan warna tema).
+- Ikon dibuat `python/buat_ikon.py` (gradasi pink → ungu).
+- Musik latar ceria (C–G–Am–F, ±116 BPM) dibuat dengan kode di `js/audio.js`. Jangan menambah
+  berkas musik berhak cipta.
+- Jangan memakai gambar stok bertanda air/berlisensi (mis. Pngtree). Gambar harus buatan sendiri
+  atau berlisensi bebas yang jelas.
 
 ## Aturan Literasi Matematika
 

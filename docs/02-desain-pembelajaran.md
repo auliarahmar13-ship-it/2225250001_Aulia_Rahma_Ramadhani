@@ -46,6 +46,7 @@ Beranda
        5. Latihan adaptif   (5 jenis × 3 level, petunjuk bertahap, contoh)
        6. Literasi          (5 masalah × 4 tahap)
        7. Kuis              (15 soal, pembahasan, analisis miskonsepsi)
+  └─ Games (kapan saja)     Balon Pola · Lompat Katak · Menara Angka
 ```
 
 Siswa boleh membuka bagian mana pun (tidak dikunci), tetapi Beranda selalu
@@ -80,7 +81,12 @@ kuis, dan setiap masalah literasi. Data dipakai untuk:
 
 ## 5. Gaya Visual
 
+- Tema ceria **pink–ungu** (gradasi `#ff4fa3 → #c026d3 → #7c3aed`) agar menyenangkan bagi siswa SMP.
 - Warna sinyal: a = biru, b = oranye, n = ungu, Uₙ/Sₙ = hijau.
+- **Maskot**: 4 teman belajar (Raka, Dimas, Sari, Nia) berseragam sekolah, digambar sebagai SVG.
+  Mereka bergoyang, melambai, dan berkedip; jika disentuh, mereka melompat dan memberi kata penyemangat.
+  Maskot hanya tampil di Beranda, Games, dan layar selesai (prinsip *coherence*: tidak mengganggu
+  saat membaca materi atau mengerjakan soal).
 - Tipografi sistem, ukuran dasar 17 px (bisa 19/21 px).
 - Satu tombol utama per layar, terletak di bawah (mudah dijangkau ibu jari).
 - Mode gelap mengikuti pengaturan HP.
@@ -89,7 +95,8 @@ kuis, dan setiap masalah literasi. Data dipakai untuk:
 
 | Elemen | Desain | Alasan CLT |
 |--------|--------|------------|
-| Musik latar | Pad akor lembut + arpeggio pentatonik, generatif (Web Audio), volume 35% | Suasana tenang; bisa dimatikan agar tidak menambah beban ekstrinsik |
+| Musik latar | Ceria: progresi C–G–Am–F, ±116 BPM, bas melompat, petikan ala ukulele, melodi marimba, perkusi ringan (Web Audio), volume 35% | Menyenangkan dan memotivasi; bisa dimatikan agar tidak menambah beban ekstrinsik |
+| Efek games | Pop balon, lompat, cebur, boing, fanfare rekor | Umpan balik permainan yang menyenangkan |
 | Efek benar | Dua nada naik | Umpan balik cepat tanpa membaca |
 | Efek salah | Nada rendah lembut, tidak mengagetkan | Tidak menghukum |
 | Narasi | Web Speech API, `id-ID` | Prinsip modalitas |

@@ -60,7 +60,9 @@ mulai dari mana.
 6. **Skala beban kognitif** (Paas, 1–9) setelah setiap unit materi, latihan, dan kuis.
 7. **Profil & pengaturan**: progres, riwayat, ekspor data, musik on/off, ukuran teks.
 8. **PWA**: dapat dipasang dari browser, berjalan offline.
-9. **Python**: pembuat bank soal (dengan verifikasi kunci), pembuat ikon, server lokal, analisis statistik.
+9. **Games aritmatika** (3 game): Balon Pola, Lompat Katak, Menara Angka, dengan skor, bintang, dan rekor.
+10. **Maskot animasi**: 4 teman belajar yang bergoyang, melambai, berkedip, dan melompat saat disentuh.
+11. **Python**: pembuat bank soal (dengan verifikasi kunci), pembuat ikon, server lokal, analisis statistik.
 
 ### 5.2 Tidak Termasuk (MVP)
 - Akun/login dan server basis data (data tersimpan di perangkat siswa).
@@ -116,6 +118,20 @@ mulai dari mana.
 - Tombol "Pasang Aplikasi" (Android/Chrome) dan panduan untuk iPhone (Safari → Bagikan → Tambah ke Layar Utama).
 - Seluruh aset di-cache oleh *service worker*; aplikasi berjalan tanpa internet setelah dibuka sekali.
 
+### F10 — Games Aritmatika
+*Sebagai siswa, saya ingin berlatih sambil bermain agar tidak bosan.*
+- **Balon Pola 🎈**: ketuk balon berisi suku yang hilang; 3 nyawa, kombo, makin cepat.
+- **Lompat Katak 🐸**: pilih panjang lompatan (beda) agar katak tepat di bunga, atau tebak posisi akhir (Uₙ); 8 ronde.
+- **Menara Angka 🧱**: susun 4 balok menjadi barisan aritmatika dan hindari 1 balok penyusup; 8 ronde.
+- Setiap game memiliki layar cara main, skor, 0–3 bintang, rekor tersimpan, konfeti, dan pembahasan singkat.
+- Games bersifat santai (Balon Pola memakai kecepatan). Latihan terarah tanpa batas waktu tetap di menu Latihan.
+
+### F11 — Maskot & Tema Ceria
+- 4 karakter siswa berseragam (SVG buatan sendiri) di Beranda, Games, dan layar selesai.
+- Animasi: bergoyang, melambai, berkedip; disentuh → melompat + gelembung kata penyemangat.
+- Tema pink–ungu, ikon gradasi pink–ungu, musik latar ceria.
+- Animasi dapat dimatikan dan otomatis mati bila pengguna memilih "kurangi gerakan".
+
 ### F9 — Analisis Statistik (Python)
 - Statistik deskriptif skor kuis, tingkat kesukaran butir (p), daya beda (korelasi point-biserial), reliabilitas KR-20.
 - Frekuensi miskonsepsi, rata-rata beban kognitif per konteks, korelasi beban kognitif dengan skor.
@@ -149,6 +165,7 @@ mulai dari mana.
 | Kuota internet terbatas | PWA offline, ukuran kecil |
 | Suara Indonesia (TTS) tidak tersedia di perangkat | Tombol narasi disembunyikan bila tidak ada `speechSynthesis`; memakai suara bawaan |
 | Musik mengganggu konsentrasi (beban ekstrinsik) | Volume rendah bawaan, mudah dimatikan, turun saat narasi |
+| Animasi/games mengalihkan perhatian dari materi | Animasi hanya di Beranda/Games/layar selesai, bukan di kartu materi atau soal; bisa dimatikan |
 | Data siswa hilang saat ganti HP | Fitur ekspor; dijelaskan di panduan guru |
 | Layanan *hosting* berubah | Kode di GitHub; bisa dipindah ke Netlify/Vercel dalam hitungan menit |
 

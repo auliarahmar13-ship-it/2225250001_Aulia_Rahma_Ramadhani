@@ -2,6 +2,7 @@ import { h } from '../ui.js';
 import { ambil } from '../state.js';
 import { UNIT } from '../data/materi.js';
 import { LITERASI } from '../data/literasi.js';
+import { maskot } from '../maskot.js';
 import { bisaPasang, pasang, sudahTerpasang, iOS } from '../pasang.js';
 
 export function langkahBelajar() {
@@ -26,7 +27,8 @@ export function tampil(root) {
   root.append(
     h('section', { class: 'sapaan' },
       h('h1', {}, `Halo, ${nama || 'Sobat Matematika'}! 👋`),
-      h('p', {}, 'Ayo belajar barisan & deret aritmatika, sedikit demi sedikit.')),
+      h('p', {}, 'Ayo belajar barisan & deret aritmatika bareng teman-teman!'),
+      maskot({ pesan: 'Ketuk kami, ya! 👆' })),
 
     berikut
       ? h('a', { class: 'kartu kartu-lanjut', href: berikut.href },
@@ -37,6 +39,11 @@ export function tampil(root) {
           h('div', { class: 'kecil muted' }, berikut.ket)),
         h('span', { class: 'panah', 'aria-hidden': 'true' }, '→'))
       : h('div', { class: 'kartu kartu-selamat' }, '🎉 Hebat! Semua langkah sudah selesai. Coba kuis lagi untuk meningkatkan skormu.'),
+
+    h('a', { class: 'kartu kartu-games', href: '#/games' },
+      h('span', { class: 'kartu-games-ikon', 'aria-hidden': 'true' }, '🎮'),
+      h('span', {}, h('span', { class: 'tebal' }, 'Games Aritmatika'), h('br'), h('span', { class: 'kecil' }, 'Balon Pola · Lompat Katak · Menara Angka')),
+      h('span', { class: 'panah', 'aria-hidden': 'true' }, '→')),
 
     h('h2', { class: 'judul-bagian' }, 'Peta Belajar'),
     h('ol', { class: 'peta' }, langkah.map((l) => h('li', {},
@@ -52,7 +59,8 @@ export function tampil(root) {
       h('ul', {},
         h('li', {}, 'Belajar 5–10 menit, lalu istirahat sebentar.'),
         h('li', {}, 'Tekan 🔊 untuk mendengarkan penjelasan.'),
-        h('li', {}, 'Musik bisa dimatikan lewat tombol 🎵 di atas.'))),
+        h('li', {}, 'Musik bisa dimatikan lewat tombol 🎵 di atas.'),
+        h('li', {}, 'Selesai belajar? Main games untuk istirahat sambil berlatih! 🎮'))),
   );
 }
 

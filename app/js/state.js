@@ -8,7 +8,8 @@ function bawaan() {
     versi: 1,
     idPerangkat: Math.random().toString(36).slice(2, 10),
     profil: { nama: '', kelas: '' },
-    pengaturan: { musik: true, efek: true, volumeMusik: 0.35, narasi: true, ukuranTeks: 'normal' },
+    pengaturan: { musik: true, efek: true, volumeMusik: 0.35, narasi: true, ukuranTeks: 'normal', animasi: true },
+    permainan: {},
     materiSelesai: {},
     posisiKartu: {},
     levelLatihan: {},
@@ -56,6 +57,15 @@ export function aturPosisi(unitId, i) { data.posisiKartu[unitId] = i; simpan(); 
 export function tandaiMateri(unitId) { data.materiSelesai[unitId] = true; simpan(); }
 export function aturLevel(jenis, level) { data.levelLatihan[jenis] = level; simpan(); }
 export function tandaiLiterasi(id) { data.literasiSelesai[id] = true; simpan(); }
+
+// Games: simpan skor tertinggi. Mengembalikan true bila rekor baru.
+export function catatPermainan(id, skor) {
+  const p = data.permainan[id] || { rekor: 0, main: 0 };
+  const rekorBaru = skor > p.rekor;
+  data.permainan[id] = { rekor: Math.max(p.rekor, skor), main: p.main + 1, terakhir: sekarang() };
+  simpan();
+  return rekorBaru;
+}
 
 export function catatLatihan(e) { data.latihan.push({ waktu: sekarang(), ...e }); simpan(); }
 export function catatKuis(e) { data.kuis.push({ waktu: sekarang(), ...e }); simpan(); }

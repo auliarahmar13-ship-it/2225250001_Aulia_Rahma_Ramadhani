@@ -74,3 +74,11 @@ ahli materi.
 | suku-n | n ≤ 15 | n ≤ 30 | n ≤ 60, b bisa negatif |
 | cari-n | n ≤ 15 | n ≤ 30 | n ≤ 50 |
 | jumlah | n ≤ 10 | n ≤ 20 | n ≤ 30 |
+
+## Games Aritmatika
+
+| Game | Konsep | Mekanik | Skor |
+|------|--------|---------|------|
+| 🎈 Balon Pola | Beda, suku berikutnya/hilang | Barisan 5 suku dengan 1 "?"; ketuk balon yang benar. 3 nyawa, kombo, kecepatan naik, dan setelah skor 60/120 muncul beda negatif & suku tengah yang hilang | 10 + bonus kombo |
+| 🐸 Lompat Katak | b = (Uₙ − a)/(n − 1), Uₙ = a + (n − 1)b | 8 ronde, bergantian: pilih panjang lompatan agar tepat di bunga / tebak posisi akhir. Jejak lompatan diberi label U₂, U₃, ... | 100 per ronde tepat |
+| 🧱 Menara Angka | Mengenali barisan aritmatika | 5 balok (4 barisan + 1 penyusup), susun dari terkecil; 8 ronde | 100 − 30 × salah |

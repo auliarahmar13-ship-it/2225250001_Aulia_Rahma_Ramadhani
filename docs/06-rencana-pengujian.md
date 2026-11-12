@@ -20,6 +20,11 @@
 | UF14 | Mode pesawat setelah kunjungan pertama | Semua halaman tetap berjalan |
 | UF15 | Pasang aplikasi (Android Chrome) | Ikon muncul di layar utama; terbuka layar penuh |
 | UF16 | Hapus data | Progres kembali kosong setelah konfirmasi |
+| UF17 | Ketuk maskot di Beranda | Anak melompat, bunyi "boing", gelembung penyemangat muncul |
+| UF18 | Matikan "Animasi maskot" | Maskot diam |
+| UF19 | Balon Pola: ketuk balon benar / salah / biarkan lolos | +poin & kombo / nyawa berkurang / nyawa berkurang; 0 nyawa → layar akhir |
+| UF20 | Lompat Katak: jawab benar & salah | Katak melompat tiap suku; benar → menang, salah → tercebur + penjelasan |
+| UF21 | Menara Angka: ketuk penyusup | Balok bergoyang, pesan "penyusup"; 8 ronde → bintang & rekor tersimpan |
 
 ## 2. Uji Perangkat
 

@@ -2,7 +2,7 @@
 Membuat ikon PWA DeretKu (PNG) hanya dengan pustaka standar Python.
 
 Gambar: empat batang yang tingginya naik dengan selisih tetap, yaitu
-visualisasi barisan aritmatika. Batang terakhir berwarna jingga ("suku berikutnya").
+visualisasi barisan aritmatika. Latar gradasi pink → ungu; batang terakhir kuning ("suku berikutnya").
 
 Jalankan:  python python/buat_ikon.py
 Keluaran:  app/icons/icon-192.png, icon-512.png, maskable-512.png
@@ -17,10 +17,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 FOLDER = ROOT / "app" / "icons"
 
-ATAS = (47, 111, 219)      # #2f6fdb
-BAWAH = (91, 75, 214)      # #5b4bd6
+ATAS = (255, 79, 163)      # #ff4fa3 pink
+BAWAH = (124, 58, 237)     # #7c3aed ungu
 PUTIH = (255, 255, 255)
-JINGGA = (255, 176, 32)
+JINGGA = (255, 214, 64)    # kuning cerah
 
 
 def tulis_png(path: Path, lebar: int, tinggi: int, piksel: list[bytes]) -> None:

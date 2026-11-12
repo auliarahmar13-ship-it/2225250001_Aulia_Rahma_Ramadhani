@@ -2,6 +2,7 @@ import { h, tombolNarasi, kotakUmpan, tanyaBeban } from '../ui.js';
 import { ambil, catatLiterasi, tandaiLiterasi } from '../state.js';
 import { efek, hentikanNarasi } from '../audio.js';
 import { LITERASI, TAHAP, cariLiterasi } from '../data/literasi.js';
+import { maskot, sorak } from '../maskot.js';
 
 export function tampilDaftar(root) {
   const d = ambil();
@@ -85,8 +86,10 @@ export function tampilMasalah(root, [id]) {
     await tanyaBeban(`literasi:${m.id}`, m.judul);
     const berikut = LITERASI[LITERASI.indexOf(m) + 1];
     const menit = Math.max(1, Math.round((Date.now() - mulaiWaktu) / 60000));
+    const m = maskot({ pesan: 'Masalah terpecahkan! 🌟', kecil: true });
+    setTimeout(() => sorak(m), 200);
     const hasil = h('section', { class: 'kartu layar-selesai' },
-      h('div', { class: 'besar', 'aria-hidden': 'true' }, '🌟'),
+      m,
       h('h2', {}, 'Masalah terpecahkan!'),
       h('p', {}, `Kamu sudah melewati keempat tahap dalam ±${menit} menit.`),
       h('p', { class: 'muted kecil' }, 'Ingat: memahami → merumuskan → menghitung → menafsirkan. Pakai langkah ini untuk setiap soal cerita.'),

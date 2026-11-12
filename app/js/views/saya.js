@@ -60,7 +60,8 @@ export function tampil(root) {
         stat(`${LITERASI.filter((l) => d.literasiSelesai[l.id]).length}/${LITERASI.length}`, 'Literasi'),
         stat(terbaik, 'Skor kuis terbaik'),
         stat(rataBeban, 'Rata-rata usaha pikiran (1–9)'),
-        stat(d.kuis.length, 'Kali kuis')),
+        stat(d.kuis.length, 'Kali kuis'),
+        stat(Object.values(d.permainan || {}).reduce((n, g) => n + g.main, 0), 'Kali main games')),
       d.kuis.length ? h('div', {},
         h('h3', {}, 'Riwayat kuis'),
         h('ul', { class: 'riwayat' }, d.kuis.slice().reverse().slice(0, 10).map((k) => h('li', {},
@@ -72,6 +73,7 @@ export function tampil(root) {
       saklar('🎵 Musik latar', 'musik', (on) => (on ? mulaiMusik() : hentikanMusik())),
       h('label', { class: 'baris-saklar' }, h('span', {}, '🔉 Volume musik'), volume),
       saklar('🔔 Efek suara', 'efek', (on) => on && efek('benar')),
+      saklar('🤸 Animasi maskot', 'animasi', (on) => { document.documentElement.dataset.animasi = on ? 'nyala' : 'mati'; }),
       narasiTersedia ? saklar('🔊 Tombol narasi', 'narasi', () => {}) : h('p', { class: 'kecil muted' }, 'Narasi suara tidak didukung di browser ini.'),
       h('div', { class: 'baris-saklar' }, h('span', {}, '🔤 Ukuran teks'), ukuran)),
 

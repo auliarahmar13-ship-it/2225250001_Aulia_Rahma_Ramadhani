@@ -9,6 +9,7 @@ import * as latihan from './views/latihan.js';
 import * as kuis from './views/kuis.js';
 import * as literasi from './views/literasi.js';
 import * as saya from './views/saya.js';
+import * as games from './views/games.js';
 
 const RUTE = [
   { pola: /^\/$/, view: beranda.tampil, judul: 'DeretKu', tab: 'beranda' },
@@ -19,6 +20,8 @@ const RUTE = [
   { pola: /^\/literasi$/, view: literasi.tampilDaftar, judul: 'Literasi', tab: 'literasi' },
   { pola: /^\/literasi\/(\w+)$/, view: literasi.tampilMasalah, judul: 'Literasi', tab: 'literasi', induk: '#/literasi' },
   { pola: /^\/kuis$/, view: kuis.tampil, judul: 'Kuis', tab: 'kuis' },
+  { pola: /^\/games$/, view: games.tampilDaftar, judul: 'Games', tab: 'games' },
+  { pola: /^\/games\/(\w+)$/, view: games.tampilGame, judul: 'Games', tab: 'games', induk: '#/games' },
   { pola: /^\/saya$/, view: saya.tampil, judul: 'Saya', tab: 'saya' },
 ];
 
@@ -48,6 +51,7 @@ function render() {
   document.title = cocok.judul === 'DeretKu' ? 'DeretKu: Barisan & Deret Aritmatika' : `${cocok.judul} · DeretKu`;
   induk = cocok.induk || '#/';
   tombolKembali.hidden = !cocok.induk;
+  document.getElementById('tombol-saya').classList.toggle('aktif', cocok.tab === 'saya');
   document.querySelectorAll('.tab').forEach((t) => {
     const aktif = t.dataset.tab === cocok.tab;
     t.classList.toggle('aktif', aktif);
@@ -87,12 +91,13 @@ window.addEventListener('keydown', interaksiPertama);
 
 // Bunyi klik halus untuk navigasi
 document.addEventListener('click', (e) => {
-  const el = e.target.closest('.tab, a.btn, a.item-daftar, a.peta-item');
+  const el = e.target.closest('.tab, a.btn, a.item-daftar, a.peta-item, a.kartu-game, #tombol-saya');
   if (el) efek('klik');
 });
 
 // ---- tampilan
 document.documentElement.dataset.teks = ambil().pengaturan.ukuranTeks || 'normal';
+document.documentElement.dataset.animasi = ambil().pengaturan.animasi === false ? 'mati' : 'nyala';
 perbaruiTombolMusik();
 saatStatusPasang(() => { if (/^#?\/?$/.test(location.hash)) render(); });
 window.addEventListener('hashchange', render);

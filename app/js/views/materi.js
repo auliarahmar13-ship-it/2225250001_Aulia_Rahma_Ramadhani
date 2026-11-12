@@ -2,6 +2,7 @@ import { h, visualBarisan, tombolNarasi, kotakUmpan, batangProgres, tanyaBeban }
 import { ambil, aturPosisi, tandaiMateri } from '../state.js';
 import { efek, hentikanNarasi } from '../audio.js';
 import { UNIT, cariUnit } from '../data/materi.js';
+import { maskot, sorak } from '../maskot.js';
 
 // ------------------------------------------------------------------ daftar unit
 export function tampilDaftar(root) {
@@ -143,8 +144,10 @@ export function tampilUnit(root, [id]) {
     await tanyaBeban(`materi:${id}`, unit.judul);
     const idx = UNIT.indexOf(unit);
     const lanjut = UNIT[idx + 1];
+    const m = maskot({ pesan: 'Hore, kamu hebat! 🎉', kecil: true });
+    setTimeout(() => sorak(m), 200);
     root.replaceChildren(h('section', { class: 'kartu layar-selesai' },
-      h('div', { class: 'besar', 'aria-hidden': 'true' }, '🎉'),
+      m,
       h('h1', {}, 'Unit selesai!'),
       h('p', {}, `Kamu telah menyelesaikan "${unit.judul}". Kerja bagus!`),
       h('div', { class: 'tumpuk-tombol' },

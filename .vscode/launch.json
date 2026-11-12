@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "▶ Jalankan DeretKu (server lokal)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/python/serve.py",
+      "console": "integratedTerminal",
+      "env": { "PYTHONIOENCODING": "utf-8" }
+    },
+    {
+      "name": "📊 Analisis statistik",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/python/analisis_statistik.py",
+      "console": "integratedTerminal",
+      "env": { "PYTHONIOENCODING": "utf-8" }
+    },
+    {
+      "name": "📝 Buat ulang bank soal",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/python/generate_bank_soal.py",
+      "console": "integratedTerminal",
+      "env": { "PYTHONIOENCODING": "utf-8" }
+    },
+    {
+      "name": "🧪 Buat data siswa simulasi",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/python/buat_data_contoh.py",
+      "console": "integratedTerminal",
+      "env": { "PYTHONIOENCODING": "utf-8" }
+    }
+  ]
+}

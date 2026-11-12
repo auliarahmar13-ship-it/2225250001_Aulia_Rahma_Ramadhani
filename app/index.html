@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="DeretKu: belajar barisan dan deret aritmatika untuk SMP. Materi singkat, latihan adaptif, literasi matematika, dan kuis.">
+  <meta name="theme-color" content="#2f6fdb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="DeretKu">
+  <title>DeretKu: Barisan & Deret Aritmatika</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <button id="tombol-kembali" class="btn-ikon" type="button" aria-label="Kembali" hidden>←</button>
+    <a href="#/" class="logo" aria-label="Beranda DeretKu">
+      <img src="icons/icon-192.png" alt="" width="28" height="28">
+      <span id="judul-halaman">DeretKu</span>
+    </a>
+    <button id="tombol-musik" class="btn-ikon" type="button" aria-label="Matikan musik">🎵</button>
+  </header>
+
+  <main id="app" tabindex="-1">
+    <noscript><p style="padding:16px">DeretKu membutuhkan JavaScript. Aktifkan JavaScript di browsermu.</p></noscript>
+  </main>
+
+  <nav class="tabbar" aria-label="Menu utama">
+    <a class="tab" data-tab="beranda" href="#/"><span aria-hidden="true">🏠</span><span>Beranda</span></a>
+    <a class="tab" data-tab="materi" href="#/materi"><span aria-hidden="true">📚</span><span>Materi</span></a>
+    <a class="tab" data-tab="latihan" href="#/latihan"><span aria-hidden="true">✏️</span><span>Latihan</span></a>
+    <a class="tab" data-tab="literasi" href="#/literasi"><span aria-hidden="true">📖</span><span>Literasi</span></a>
+    <a class="tab" data-tab="kuis" href="#/kuis"><span aria-hidden="true">🏆</span><span>Kuis</span></a>
+    <a class="tab" data-tab="saya" href="#/saya"><span aria-hidden="true">👤</span><span>Saya</span></a>
+  </nav>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

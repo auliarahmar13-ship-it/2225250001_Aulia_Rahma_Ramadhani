@@ -1,0 +1,519 @@
+{
+  "versi": 1,
+  "dibuat": "2026-11-11",
+  "keterangan": "Dibuat otomatis oleh python/generate_bank_soal.py. Jangan diedit manual.",
+  "miskonsepsi": {
+    "M-n-bukan-n-1": "Memakai n, padahal seharusnya (n − 1) pada rumus Uₙ = a + (n − 1)b.",
+    "M-lupa-bagi-2": "Lupa membagi 2 pada rumus Sₙ = n/2 (a + Uₙ).",
+    "M-U-vs-S": "Tertukar antara suku ke-n (Uₙ) dan jumlah n suku pertama (Sₙ).",
+    "M-beda-terbalik": "Menghitung beda terbalik (U₁ − U₂), sehingga tandanya salah.",
+    "M-a-sebagai-b": "Mengira suku pertama (a) sebagai beda (b), atau sebaliknya.",
+    "M-lupa-tambah-1": "Lupa menambah 1 saat menghitung banyak suku: n = (Uₙ − a)/b + 1.",
+    "M-tanpa-bagi-b": "Tidak membagi dengan beda saat mencari banyak suku.",
+    "M-tanpa-a": "Lupa menambahkan suku pertama (a).",
+    "M-suku-lanjut": "Menjawab suku lain, bukan suku yang ditanyakan.",
+    "M-operasi-terbalik": "Memakai operasi yang terbalik (menambah, padahal seharusnya mengurangi).",
+    "M-lupa-bagi": "Lupa membagi selisih suku dengan selisih urutannya.",
+    "M-pola-kali": "Mengira pola dikali (geometri) sebagai barisan aritmatika.",
+    "M-pola-kuadrat": "Mengira pola bilangan kuadrat sebagai barisan aritmatika.",
+    "M-selisih-berubah": "Tidak memeriksa bahwa selisih harus selalu sama.",
+    "M-hitung": "Kesalahan operasi hitung."
+  },
+  "soal": [
+    {
+      "id": "K01",
+      "indikator": "TP2",
+      "level": "mudah",
+      "pertanyaan": "Beda dari barisan 4, 9, 14, 19, ... adalah ....",
+      "opsi": [
+        {
+          "teks": "5",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "−5",
+          "benar": false,
+          "miskonsepsi": "M-beda-terbalik"
+        },
+        {
+          "teks": "4",
+          "benar": false,
+          "miskonsepsi": "M-a-sebagai-b"
+        },
+        {
+          "teks": "24",
+          "benar": false,
+          "miskonsepsi": "M-suku-lanjut"
+        }
+      ],
+      "pembahasan": [
+        "b = U₂ − U₁ = 9 − 4 = 5",
+        "Periksa: 14 − 9 = 5, 19 − 14 = 5. Selisihnya selalu sama."
+      ]
+    },
+    {
+      "id": "K02",
+      "indikator": "TP1",
+      "level": "mudah",
+      "pertanyaan": "Bilangan berikutnya dari barisan 31, 27, 23, 19, ... adalah ....",
+      "opsi": [
+        {
+          "teks": "15",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "17",
+          "benar": false,
+          "miskonsepsi": "M-hitung"
+        },
+        {
+          "teks": "43",
+          "benar": false,
+          "miskonsepsi": "M-beda-terbalik"
+        },
+        {
+          "teks": "11",
+          "benar": false,
+          "miskonsepsi": "M-suku-lanjut"
+        }
+      ],
+      "pembahasan": [
+        "Selisihnya: 27 − 31 = −4 (barisan turun 4).",
+        "Bilangan berikutnya: 19 − 4 = 15"
+      ]
+    },
+    {
+      "id": "K03",
+      "indikator": "TP2",
+      "level": "mudah",
+      "pertanyaan": "Manakah yang merupakan barisan aritmatika?",
+      "opsi": [
+        {
+          "teks": "2, 6, 10, 14",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "2, 4, 8, 16",
+          "benar": false,
+          "miskonsepsi": "M-pola-kali"
+        },
+        {
+          "teks": "1, 4, 9, 16",
+          "benar": false,
+          "miskonsepsi": "M-pola-kuadrat"
+        },
+        {
+          "teks": "3, 5, 8, 12",
+          "benar": false,
+          "miskonsepsi": "M-selisih-berubah"
+        }
+      ],
+      "pembahasan": [
+        "Barisan aritmatika memiliki selisih yang selalu sama.",
+        "2, 6, 10, 14 → selisihnya 4, 4, 4 (selalu sama).",
+        "2, 4, 8, 16 dikali 2; 1, 4, 9, 16 bilangan kuadrat; 3, 5, 8, 12 selisihnya 2, 3, 4."
+      ]
+    },
+    {
+      "id": "K04",
+      "indikator": "TP3",
+      "level": "sedang",
+      "pertanyaan": "Suku ke-15 dari barisan 3, 7, 11, ... adalah ....",
+      "opsi": [
+        {
+          "teks": "59",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "63",
+          "benar": false,
+          "miskonsepsi": "M-n-bukan-n-1"
+        },
+        {
+          "teks": "60",
+          "benar": false,
+          "miskonsepsi": "M-tanpa-a"
+        },
+        {
+          "teks": "56",
+          "benar": false,
+          "miskonsepsi": "M-tanpa-a"
+        }
+      ],
+      "pembahasan": [
+        "a = 3, b = 4, n = 15",
+        "U₁₅ = a + (n − 1)b = 3 + (15 − 1) × 4",
+        "U₁₅ = 3 + 14 × 4 = 3 + 56 = 59"
+      ]
+    },
+    {
+      "id": "K05",
+      "indikator": "TP3",
+      "level": "sedang",
+      "pertanyaan": "Rumus suku ke-n dari barisan 6, 10, 14, ... adalah Uₙ = ....",
+      "opsi": [
+        {
+          "teks": "4n + 2",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "4n + 6",
+          "benar": false,
+          "miskonsepsi": "M-n-bukan-n-1"
+        },
+        {
+          "teks": "6n + 4",
+          "benar": false,
+          "miskonsepsi": "M-a-sebagai-b"
+        },
+        {
+          "teks": "4n − 2",
+          "benar": false,
+          "miskonsepsi": "M-hitung"
+        }
+      ],
+      "pembahasan": [
+        "a = 6, b = 4",
+        "Uₙ = a + (n − 1)b = 6 + (n − 1) × 4",
+        "Uₙ = 6 + 4n − 4 = 4n + 2",
+        "Periksa: n = 1 → 4(1) + 2 = 6 ✓"
+      ]
+    },
+    {
+      "id": "K06",
+      "indikator": "TP3",
+      "level": "sedang",
+      "pertanyaan": "Banyak suku pada barisan 5, 9, 13, ..., 101 adalah ....",
+      "opsi": [
+        {
+          "teks": "25",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "24",
+          "benar": false,
+          "miskonsepsi": "M-lupa-tambah-1"
+        },
+        {
+          "teks": "96",
+          "benar": false,
+          "miskonsepsi": "M-tanpa-bagi-b"
+        },
+        {
+          "teks": "26",
+          "benar": false,
+          "miskonsepsi": "M-hitung"
+        }
+      ],
+      "pembahasan": [
+        "Uₙ = 101, a = 5, b = 4",
+        "101 = 5 + (n − 1) × 4",
+        "96 = (n − 1) × 4 → n − 1 = 24",
+        "n = 25"
+      ]
+    },
+    {
+      "id": "K07",
+      "indikator": "TP3",
+      "level": "sulit",
+      "pertanyaan": "Suku ke-8 suatu barisan aritmatika adalah 30 dan bedanya 3. Suku pertamanya adalah ....",
+      "opsi": [
+        {
+          "teks": "9",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "6",
+          "benar": false,
+          "miskonsepsi": "M-n-bukan-n-1"
+        },
+        {
+          "teks": "27",
+          "benar": false,
+          "miskonsepsi": "M-hitung"
+        },
+        {
+          "teks": "51",
+          "benar": false,
+          "miskonsepsi": "M-operasi-terbalik"
+        }
+      ],
+      "pembahasan": [
+        "U₈ = a + 7b → 30 = a + 7 × 3",
+        "30 = a + 21",
+        "a = 30 − 21 = 9"
+      ]
+    },
+    {
+      "id": "K08",
+      "indikator": "TP3",
+      "level": "sulit",
+      "pertanyaan": "Diketahui U₃ = 11 dan U₇ = 27 pada suatu barisan aritmatika. Bedanya adalah ....",
+      "opsi": [
+        {
+          "teks": "4",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "16",
+          "benar": false,
+          "miskonsepsi": "M-lupa-bagi"
+        },
+        {
+          "teks": "5",
+          "benar": false,
+          "miskonsepsi": "M-hitung"
+        },
+        {
+          "teks": "3",
+          "benar": false,
+          "miskonsepsi": "M-a-sebagai-b"
+        }
+      ],
+      "pembahasan": [
+        "Dari U₃ ke U₇ ada 7 − 3 = 4 langkah beda.",
+        "4b = U₇ − U₃ = 27 − 11 = 16",
+        "b = 16 : 4 = 4"
+      ]
+    },
+    {
+      "id": "K09",
+      "indikator": "TP4",
+      "level": "sedang",
+      "pertanyaan": "Jumlah 10 suku pertama deret 2 + 5 + 8 + ... adalah ....",
+      "opsi": [
+        {
+          "teks": "155",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "310",
+          "benar": false,
+          "miskonsepsi": "M-lupa-bagi-2"
+        },
+        {
+          "teks": "29",
+          "benar": false,
+          "miskonsepsi": "M-U-vs-S"
+        },
+        {
+          "teks": "170",
+          "benar": false,
+          "miskonsepsi": "M-n-bukan-n-1"
+        }
+      ],
+      "pembahasan": [
+        "a = 2, b = 3, n = 10",
+        "Sₙ = n/2 (2a + (n − 1)b) = 10/2 × (2 × 2 + 9 × 3)",
+        "S₁₀ = 5 × (4 + 27) = 5 × 31 = 155"
+      ]
+    },
+    {
+      "id": "K10",
+      "indikator": "TP4",
+      "level": "sedang",
+      "pertanyaan": "Hasil dari 1 + 2 + 3 + ... + 50 adalah ....",
+      "opsi": [
+        {
+          "teks": "1.275",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "2.550",
+          "benar": false,
+          "miskonsepsi": "M-lupa-bagi-2"
+        },
+        {
+          "teks": "1.250",
+          "benar": false,
+          "miskonsepsi": "M-hitung"
+        },
+        {
+          "teks": "50",
+          "benar": false,
+          "miskonsepsi": "M-U-vs-S"
+        }
+      ],
+      "pembahasan": [
+        "a = 1, Uₙ = 50, n = 50",
+        "Sₙ = n/2 (a + Uₙ) = 50/2 × (1 + 50)",
+        "S₅₀ = 25 × 51 = 1.275"
+      ]
+    },
+    {
+      "id": "K11",
+      "indikator": "TP4",
+      "level": "sulit",
+      "pertanyaan": "Jumlah semua bilangan genap dari 2 sampai 40 adalah ....",
+      "opsi": [
+        {
+          "teks": "420",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "840",
+          "benar": false,
+          "miskonsepsi": "M-lupa-bagi-2"
+        },
+        {
+          "teks": "40",
+          "benar": false,
+          "miskonsepsi": "M-U-vs-S"
+        },
+        {
+          "teks": "400",
+          "benar": false,
+          "miskonsepsi": "M-hitung"
+        }
+      ],
+      "pembahasan": [
+        "Barisannya 2, 4, 6, ..., 40 → a = 2, b = 2",
+        "Banyak suku: 40 = 2 + (n − 1) × 2 → n = 20",
+        "S₂₀ = 20/2 × (2 + 40) = 10 × 42 = 420"
+      ]
+    },
+    {
+      "id": "K12",
+      "indikator": "TP5",
+      "level": "sedang",
+      "pertanyaan": "Doni menabung setiap minggu. Minggu pertama ia menabung Rp10.000, dan setiap minggu berikutnya ia menabung Rp5.000 lebih banyak daripada minggu sebelumnya. Berapa uang yang ditabung Doni pada minggu ke-8?",
+      "opsi": [
+        {
+          "teks": "Rp45.000",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "Rp50.000",
+          "benar": false,
+          "miskonsepsi": "M-n-bukan-n-1"
+        },
+        {
+          "teks": "Rp220.000",
+          "benar": false,
+          "miskonsepsi": "M-U-vs-S"
+        },
+        {
+          "teks": "Rp40.000",
+          "benar": false,
+          "miskonsepsi": "M-hitung"
+        }
+      ],
+      "pembahasan": [
+        "Yang ditanya: tabungan pada SATU minggu (minggu ke-8) → suku ke-8 (U₈).",
+        "U₈ = 10.000 + (8 − 1) × 5.000 = 10.000 + 35.000",
+        "U₈ = Rp45.000"
+      ]
+    },
+    {
+      "id": "K13",
+      "indikator": "TP5",
+      "level": "sulit",
+      "pertanyaan": "Doni menabung setiap minggu. Minggu pertama ia menabung Rp10.000, dan setiap minggu berikutnya ia menabung Rp5.000 lebih banyak daripada minggu sebelumnya. Berapa JUMLAH seluruh tabungan Doni selama 8 minggu?",
+      "opsi": [
+        {
+          "teks": "Rp220.000",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "Rp440.000",
+          "benar": false,
+          "miskonsepsi": "M-lupa-bagi-2"
+        },
+        {
+          "teks": "Rp45.000",
+          "benar": false,
+          "miskonsepsi": "M-U-vs-S"
+        },
+        {
+          "teks": "Rp240.000",
+          "benar": false,
+          "miskonsepsi": "M-n-bukan-n-1"
+        }
+      ],
+      "pembahasan": [
+        "Yang ditanya: JUMLAH selama 8 minggu → deret (S₈).",
+        "U₈ = 45.000 (tabungan minggu ke-8)",
+        "S₈ = 8/2 × (10.000 + 45.000) = 4 × 55.000 = Rp220.000"
+      ]
+    },
+    {
+      "id": "K14",
+      "indikator": "TP5",
+      "level": "sulit",
+      "pertanyaan": "Sebuah aula memiliki 20 baris kursi. Baris pertama berisi 12 kursi, dan setiap baris berikutnya bertambah 2 kursi. Banyak kursi seluruhnya di aula itu adalah ....",
+      "opsi": [
+        {
+          "teks": "620",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "1240",
+          "benar": false,
+          "miskonsepsi": "M-lupa-bagi-2"
+        },
+        {
+          "teks": "50",
+          "benar": false,
+          "miskonsepsi": "M-U-vs-S"
+        },
+        {
+          "teks": "640",
+          "benar": false,
+          "miskonsepsi": "M-n-bukan-n-1"
+        }
+      ],
+      "pembahasan": [
+        "a = 12, b = 2, n = 20",
+        "Baris terakhir: U₂₀ = 12 + 19 × 2 = 50",
+        "S₂₀ = 20/2 × (12 + 50) = 10 × 62 = 620"
+      ]
+    },
+    {
+      "id": "K15",
+      "indikator": "TP3",
+      "level": "sulit",
+      "pertanyaan": "Suatu barisan aritmatika memiliki rumus Uₙ = 3n + 1. Beda barisan tersebut adalah ....",
+      "opsi": [
+        {
+          "teks": "3",
+          "benar": true,
+          "miskonsepsi": null
+        },
+        {
+          "teks": "1",
+          "benar": false,
+          "miskonsepsi": "M-hitung"
+        },
+        {
+          "teks": "4",
+          "benar": false,
+          "miskonsepsi": "M-a-sebagai-b"
+        },
+        {
+          "teks": "7",
+          "benar": false,
+          "miskonsepsi": "M-suku-lanjut"
+        }
+      ],
+      "pembahasan": [
+        "U₁ = 3(1) + 1 = 4, U₂ = 3(2) + 1 = 7",
+        "b = U₂ − U₁ = 7 − 4 = 3",
+        "Cara cepat: beda = koefisien n pada rumus Uₙ."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "DeretKu: Barisan & Deret Aritmatika",
+  "short_name": "DeretKu",
+  "description": "Belajar barisan dan deret aritmatika untuk SMP: materi, latihan, literasi matematika, dan kuis.",
+  "lang": "id",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7fb",
+  "theme_color": "#2f6fdb",
+  "categories": ["education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

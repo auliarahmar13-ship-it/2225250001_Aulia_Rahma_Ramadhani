@@ -1,0 +1,3 @@
+# Semua skrip berjalan dengan pustaka standar Python 3.10+.
+# Paket di bawah ini OPSIONAL, hanya untuk grafik di analisis_statistik.py.
+matplotlib>=3.7

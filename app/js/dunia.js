@@ -1,8 +1,7 @@
 // Komponen "Dunia Belajar": banner halaman, baris kartu horizontal (gaya streaming), dan poster.
 
 import { h } from './ui.js';
-import { ari } from './ilustrasi.js';
-import { efek } from './audio.js';
+import { gambarTeman, pilihTeman } from './teman.js';
 
 const TEMA_DUNIA = {
   materi: { nama: 'Perpustakaan Ajaib', ikon: '📚', kelas: 'dunia-materi' },
@@ -12,8 +11,9 @@ const TEMA_DUNIA = {
   games: { nama: 'Taman Bermain', ikon: '🎡', kelas: 'dunia-games' },
 };
 
-// Banner kecil di atas halaman daftar: memberi nuansa petualangan yang konsisten
-export function bannerDunia(tema, judul, sub, pesanAri = '') {
+// Banner kecil di atas halaman daftar: memberi nuansa petualangan yang konsisten.
+// Di sini siswa disambut Teman Belajar (Ari khusus di Beranda).
+export function bannerDunia(tema, judul, sub, pesanTeman = '') {
   const t = TEMA_DUNIA[tema];
   const el = h('section', { class: `banner-dunia ${t.kelas}` },
     h('div', { class: 'banner-bintang', 'aria-hidden': 'true' }),
@@ -21,13 +21,8 @@ export function bannerDunia(tema, judul, sub, pesanAri = '') {
       h('span', { class: 'banner-dunia-nama' }, `${t.ikon} ${t.nama}`),
       h('h1', {}, judul),
       sub ? h('p', {}, sub) : null),
-    h('div', { class: 'banner-ari', html: ari({ ukuran: 96 }) }),
-    pesanAri ? h('div', { class: 'banner-gelembung' }, pesanAri) : null);
-  el.querySelector('.banner-ari').addEventListener('click', (e) => {
-    const s = e.currentTarget.querySelector('.ari');
-    s.classList.remove('ari-loncat'); void s.getBoundingClientRect(); s.classList.add('ari-loncat');
-    efek('boing');
-  });
+    h('div', { class: 'banner-teman' }, gambarTeman(pilihTeman(tema), { kelas: 'melayang-teman' })),
+    pesanTeman ? h('div', { class: 'banner-gelembung' }, pesanTeman) : null);
   return el;
 }
 

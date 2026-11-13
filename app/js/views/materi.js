@@ -2,7 +2,7 @@ import { h, visualBarisan, tombolNarasi, kotakUmpan, batangProgres, tanyaBeban }
 import { ambil, aturPosisi, tandaiMateri } from '../state.js';
 import { efek, hentikanNarasi } from '../audio.js';
 import { UNIT, cariUnit } from '../data/materi.js';
-import { maskot, sorak } from '../maskot.js';
+import { temanBelajar } from '../teman.js';
 import { bannerDunia, poster } from '../dunia.js';
 import { POSTER_UNIT } from '../ilustrasi.js';
 
@@ -10,7 +10,7 @@ import { POSTER_UNIT } from '../ilustrasi.js';
 export function tampilDaftar(root) {
   const d = ambil();
   root.append(
-    bannerDunia('materi', 'Episode Materi', 'Setiap episode berisi kartu singkat. Kamu bisa berhenti kapan saja.', 'Pilih episode! 🎬'),
+    bannerDunia('materi', 'Episode Materi', 'Setiap episode berisi kartu singkat. Kamu bisa berhenti kapan saja.', 'Hai! Yuk, belajar bareng kami! 📚'),
     h('div', { class: 'grid-poster' }, UNIT.map((u, i) => {
       const selesai = !!d.materiSelesai[u.id];
       const posisi = d.posisiKartu[u.id] || 0;
@@ -38,18 +38,28 @@ export function tampilUnit(root, [id]) {
   const kepala = h('div', { class: 'unit-kepala' });
   const wadah = h('div', { class: 'kartu-wadah' });
   const nav = h('div', { class: 'nav-bawah' });
-  root.append(kepala, wadah, nav);
+  // Teman belajar di bawah navigasi: tidak menutupi rumus/teks; tanpa animasi melayang (prinsip CLT)
+  const teman = temanBelajar('materi', 'Hai! Yuk, kita pelajari barisan aritmetika bersama-sama!', { tenang: true, kelas: 'teman-bawah' });
+  const SAPA = {
+    teks: ['Baca pelan-pelan, ya. Lihat juga gambarnya!', 'Perhatikan warnanya: a, b, dan n punya warna sendiri.'],
+    contoh: ['Buka langkahnya satu per satu, ya!'],
+    cek: ['Coba jawab dulu. Salah juga tidak apa-apa!'],
+    ringkasan: ['Ini ringkasannya. Ingat poin-poin pentingnya, ya!'],
+  };
+  root.append(kepala, wadah, nav, teman);
 
   function render() {
     hentikanNarasi();
     aturPosisi(id, i);
-    st = { langkah: 0, cekSelesai: false, percobaan: 0, elLangkah: null };
+    st = { langkah: 0, cekSelesai: false, percobaan: 0, elLangkah: null, sapaPertama: st.sapaPertama };
     const k = unit.kartu[i];
     kepala.replaceChildren(
       h('div', { class: 'unit-judul' }, h('span', { 'aria-hidden': 'true' }, unit.ikon), ' ', unit.judul),
       h('div', { class: 'kecil muted' }, `Kartu ${i + 1} dari ${total}`),
       batangProgres(i + 1, total, `Kartu ${i + 1} dari ${total}`));
     wadah.replaceChildren(buatKartu(k));
+    if (i > 0 || st.sapaPertama) { const s = SAPA[k.jenis]; teman.bicara(s[i % s.length]); }
+    st.sapaPertama = true;
     renderNav();
     window.scrollTo({ top: 0 });
   }
@@ -101,6 +111,7 @@ export function tampilUnit(root, [id]) {
       st.cekSelesai = true;
       semua.forEach((b) => { b.disabled = true; });
       umpan.replaceChildren(kotakUmpan(true, k.benar));
+      teman.bicara('Hebat! Jawabanmu tepat! 🎉', 'senang');
     } else {
       btn.classList.add('salah');
       btn.disabled = true;
@@ -111,8 +122,10 @@ export function tampilUnit(root, [id]) {
         semua.forEach((b) => { b.disabled = true; });
         st.cekSelesai = true;
         umpan.replaceChildren(kotakUmpan(false, `Jawaban yang benar: <strong>${k.opsi[k.kunci]}</strong>. ${k.benar}`));
+        teman.bicara('Tidak apa-apa! Baca penjelasannya, lalu kita lanjut bersama 😊', 'semangat');
       } else {
         umpan.replaceChildren(kotakUmpan(false, `${k.salah} Coba lagi, ya!`));
+        teman.bicara('Hampir! Baca petunjuknya, lalu coba sekali lagi 💪', 'semangat');
       }
     }
     renderNav();
@@ -143,10 +156,8 @@ export function tampilUnit(root, [id]) {
     await tanyaBeban(`materi:${id}`, unit.judul);
     const idx = UNIT.indexOf(unit);
     const lanjut = UNIT[idx + 1];
-    const m = maskot({ pesan: 'Hore, kamu hebat! 🎉', kecil: true });
-    setTimeout(() => sorak(m), 200);
     root.replaceChildren(h('section', { class: 'kartu layar-selesai' },
-      m,
+      temanBelajar('materi', `Hore! Kita sudah menyelesaikan "${unit.judul}" bersama! 🎉`, { kelas: 'teman-tengah' }),
       h('h1', {}, 'Unit selesai!'),
       h('p', {}, `Kamu telah menyelesaikan "${unit.judul}". Kerja bagus!`),
       h('div', { class: 'tumpuk-tombol' },

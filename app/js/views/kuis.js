@@ -2,6 +2,7 @@ import { h, acakUrutan, tanyaBeban, batangProgres, konfirmasi, tombolNarasi } fr
 import { ambil, catatKuis } from '../state.js';
 import { efek, hentikanNarasi } from '../audio.js';
 import { bannerDunia } from '../dunia.js';
+import { temanBelajar } from '../teman.js';
 
 let cacheBank = null;
 async function muatBank() {
@@ -17,7 +18,7 @@ export function tampil(root) {
   const terbaik = riwayat.length ? Math.max(...riwayat.map((k) => k.skor)) : null;
 
   root.append(
-    bannerDunia('kuis', 'Kuis Juara', 'Tunjukkan kemampuanmu di arena!', 'Kamu pasti bisa! 🏆'),
+    bannerDunia('kuis', 'Kuis Juara', 'Tunjukkan kemampuanmu di arena!', 'Kami dukung kamu dari sini! 💪'),
     h('div', { class: 'kartu' },
       h('ul', { class: 'info-kuis' },
         h('li', {}, '📝 15 soal pilihan ganda'),
@@ -26,6 +27,7 @@ export function tampil(root) {
         h('li', {}, '📊 Skor dan pembahasan muncul di akhir')),
       terbaik !== null ? h('p', { class: 'muted' }, `Skor terbaikmu: ${terbaik} (${riwayat.length}× mencoba)`) : null,
       h('button', { class: 'btn btn-utama lebar', onclick: () => mulai(root) }, 'Mulai Kuis')),
+    temanBelajar('kuis', 'Halo! Sebelum mulai, tarik napas dulu. Baca setiap soal dengan tenang, ya! 😊', { kelas: 'teman-bawah' }),
   );
 }
 
@@ -46,7 +48,8 @@ async function mulai(root) {
   let masuk = Date.now();
 
   const wadah = h('div');
-  root.replaceChildren(wadah);
+  const teman = temanBelajar('kuis', 'Ayo mulai! Kerjakan soal yang kamu yakini dulu, ya 👍', { tenang: true, kelas: 'teman-bawah' });
+  root.replaceChildren(wadah, teman);
 
   function catatWaktu() { durasi[i] += (Date.now() - masuk) / 1000; masuk = Date.now(); }
 
@@ -60,6 +63,8 @@ async function mulai(root) {
       onclick: () => { pilihan[i] = j; efek('klik'); render(); },
     }, h('span', { class: 'opsi-huruf' }, 'ABCD'[j]), h('span', {}, o.teks)));
     const terjawab = pilihan.filter((p) => p !== null).length;
+    if (i === soal.length - 1) teman.bicara('Soal terakhir! Semangat, sedikit lagi! 🏁', 'semangat');
+    else if (i === Math.floor(soal.length / 2)) teman.bicara('Sudah setengah jalan! Kamu keren! ⭐');
 
     wadah.replaceChildren(
       h('div', { class: 'baris-antara kecil muted' }, h('span', {}, `Soal ${i + 1} dari ${soal.length}`), h('span', {}, `${terjawab} terjawab`)),
@@ -114,10 +119,15 @@ function tampilHasil(root, soal, pilihan, skor, benar, kamusMiskonsepsi) {
     if (o && !o.benar && o.miskonsepsi && o.miskonsepsi !== 'M-hitung') miskonsepsi.set(o.miskonsepsi, (miskonsepsi.get(o.miskonsepsi) || 0) + 1);
   });
 
+  const motivasi = skor >= 90 ? 'Luar biasa! Kamu juara Negeri Aritmatika! 👑'
+    : skor >= 75 ? 'Selamat, kamu tuntas! Kami bangga belajar bersamamu! 🎉'
+      : skor >= 50 ? 'Sudah bagus! Yuk, kita lihat pembahasannya bersama, lalu coba lagi 💪'
+        : 'Jangan sedih! Kita ulangi materinya bareng-bareng, pasti bisa! 🌱';
   root.replaceChildren(
     h('section', { class: 'kartu hasil' },
       h('div', { class: `skor-lingkaran ${skor >= 75 ? 'tuntas' : ''}`, role: 'img', 'aria-label': `Skor ${skor}` }, String(skor)),
       h('h1', {}, pesan),
+      temanBelajar('kuis', motivasi, { kelas: 'teman-tengah' }),
       h('p', { class: 'muted' }, `${benar} dari ${soal.length} soal benar`),
       h('div', { class: 'tumpuk-tombol' },
         h('button', { class: 'btn btn-utama', onclick: () => { root.replaceChildren(); tampil(root); } }, '🔁 Ulangi kuis'),

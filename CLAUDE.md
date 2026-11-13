@@ -32,7 +32,8 @@ app/                    ROOT WEB: semua yang di-deploy ada di sini
   js/state.js           Penyimpanan (localStorage) + ekspor data
   js/audio.js           Musik latar generatif, efek suara, narasi (TTS)
   js/ui.js              Helper DOM, toast, modal skala beban kognitif, visual SVG
-  js/maskot.js          Maskot 4 siswa (SVG buatan sendiri) + animasi CSS, disentuh → melompat
+  js/teman.js           Teman Belajar: 4 ilustrasi siswa (img/teman/), rotasi per fitur, gelembung dialog
+  img/teman/            Aset karakter dari pengguna (JANGAN diganti/diedit/digabung)
   js/ilustrasi.js       Ilustrasi "3D" SVG: adegan hero, poster episode/misi/games, maskot Ari
   js/dunia.js           Komponen Dunia Belajar: banner halaman, baris kartu geser, poster, kartu lebar
   fonts/                Fredoka (OFL, lihat OFL.txt) untuk judul & tombol
@@ -91,8 +92,8 @@ Setiap fitur atau konten baru harus lolos daftar periksa ini:
 - Ikon dibuat `python/buat_ikon.py` (gradasi pink → ungu).
 - Musik latar ceria (C–G–Am–F, ±116 BPM) dibuat dengan kode di `js/audio.js`. Jangan menambah
   berkas musik berhak cipta.
-- Jangan memakai gambar stok bertanda air/berlisensi (mis. Pngtree). Gambar harus buatan sendiri
-  atau berlisensi bebas yang jelas.
+- Gambar baru harus buatan sendiri atau berlisensi jelas. Pengecualian: 4 gambar di `img/teman/`
+  adalah aset pilihan pengguna dan dipakai apa adanya (status lisensinya tanggung jawab pengguna).
 
 ## Gaya "Dunia Belajar" (v1.2)
 
@@ -100,8 +101,11 @@ Setiap fitur atau konten baru harus lolos daftar periksa ini:
   baris poster horizontal (`barisKartu`, `poster`, `kartuLebar` di `js/dunia.js`).
 - Setiap halaman daftar diawali `bannerDunia(tema, …)`: materi = Perpustakaan Ajaib,
   latihan = Hutan Latihan, literasi = Kota Cerita, kuis = Arena Juara, games = Taman Bermain.
-- Maskot utama **Ari** (makhluk bintang, `ari()` di `js/ilustrasi.js`); 4 siswa tetap ada di
-  "Teman Seperjalanan".
+- **Ari** (`ari()` di `js/ilustrasi.js`) HANYA pemandu di Beranda: menyambut dan memperkenalkan teman.
+- **Teman Belajar** (`temanBelajar(fitur, pesan)` di `js/teman.js`) menemani di Materi, Latihan, Kuis,
+  Literasi, Games, dan banner halaman. Rotasi per fitur di `ROTASI`. Ukuran kecil (±72 px di halaman
+  belajar, ±82 px di banner). Di halaman belajar pakai `{ tenang: true }` (tanpa melayang) dan letakkan
+  di bawah kartu/navigasi, jangan menutupi rumus, teks, atau tombol. Gambar tidak boleh diubah bentuknya.
 - Transisi halaman memakai View Transitions API **dengan pengaman 400 ms** di `app.js`
   (jangan hapus: di sebagian browser callback transisi tidak dijalankan).
 - Hindari nama variabel yang menimpa variabel luar (mis. `m` untuk maskot di dalam fungsi yang

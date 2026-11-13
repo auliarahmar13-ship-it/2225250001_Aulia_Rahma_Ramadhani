@@ -3,7 +3,7 @@
 import { h } from '../ui.js';
 import { ambil, catatPermainan } from '../state.js';
 import { efek } from '../audio.js';
-import { maskot, sorak } from '../maskot.js';
+import { temanBelajar } from '../teman.js';
 
 export const acak = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 export const pilih = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -27,6 +27,12 @@ export function konfeti(wadah = document.body, jumlah = 60) {
   setTimeout(() => lapis.remove(), 3600);
 }
 
+const AJAK = {
+  balon: 'Ayo main bareng! Lihat polanya, lalu pecahkan balon yang benar secepatnya! 🎈',
+  katak: 'Yuk, bantu katak kita! Ingat, lompatannya selalu sama panjang, ya 🐸',
+  susun: 'Ayo susun menaranya! Hati-hati, ada penyusup di antara balok 🕵️',
+};
+
 export function layarMulai(root, { id, judul, ikon, warna, cara, onMulai }) {
   const rekor = ambil().permainan[id]?.rekor || 0;
   root.replaceChildren(
@@ -34,6 +40,7 @@ export function layarMulai(root, { id, judul, ikon, warna, cara, onMulai }) {
       h('div', { class: 'game-ikon-besar', 'aria-hidden': 'true' }, ikon),
       h('h1', {}, judul),
       rekor ? h('p', { class: 'rekor' }, `🏅 Rekormu: ${rekor}`) : null,
+      temanBelajar('games', AJAK[id] || 'Ayo main bareng kami! 🎮', { kelas: 'teman-tengah teman-di-warna' }),
       h('div', { class: 'cara-main' },
         h('strong', {}, 'Cara main:'),
         h('ol', {}, cara.map((c) => h('li', { html: c })))),
@@ -46,7 +53,10 @@ export function layarMulai(root, { id, judul, ikon, warna, cara, onMulai }) {
 // bintang: 0–3
 export function layarAkhir(root, { id, skor, bintang, ringkasan, onUlang }) {
   const rekorBaru = catatPermainan(id, skor);
-  const m = maskot({ pesan: bintang >= 2 ? 'Keren banget! 🎉' : 'Ayo coba lagi! 💪', kecil: true });
+  const pesan = rekorBaru && skor > 0 ? 'Wow, rekor baru! Kamu luar biasa! 🏅'
+    : bintang >= 2 ? 'Keren banget! Main lagi, yuk! 🎉'
+      : 'Seru, kan? Ayo coba lagi, pasti makin jago! 💪';
+  const m = temanBelajar('games', pesan, { kelas: 'teman-tengah' });
   root.replaceChildren(
     h('section', { class: 'kartu game-akhir' },
       h('div', { class: 'bintang-wadah', 'aria-label': `${bintang} dari 3 bintang` },
@@ -62,7 +72,7 @@ export function layarAkhir(root, { id, skor, bintang, ringkasan, onUlang }) {
   );
   window.scrollTo({ top: 0 });
   efek(rekorBaru && skor > 0 ? 'rekor' : 'selesai');
-  if (bintang >= 2 || rekorBaru) { konfeti(); setTimeout(() => sorak(m), 300); }
+  if (bintang >= 2 || rekorBaru) { konfeti(); setTimeout(() => m.bicara(pesan, 'senang'), 300); }
 }
 
 export function bintangDari(benar, total) {

@@ -6,7 +6,7 @@ import { efek } from '../audio.js';
 import { UNIT } from '../data/materi.js';
 import { LITERASI } from '../data/literasi.js';
 import { JENIS, NAMA_LEVEL } from '../generator.js';
-import { maskot } from '../maskot.js';
+import { TEMAN, gambarTeman, peranTeman } from '../teman.js';
 import { adeganHero, ari, POSTER_UNIT, posterEmoji, posterGame, posterLiterasi } from '../ilustrasi.js';
 import { barisKartu, poster, kartuLebar } from '../dunia.js';
 import { bisaPasang, pasang, sudahTerpasang, iOS } from '../pasang.js';
@@ -105,6 +105,7 @@ export function tampil(root) {
   root.append(
     heroBanner(d, langkah, berikut),
     h('div', { class: 'beranda-isi' },
+      sambutanAri(berikut),
       barisKartu('Episode Materi', posterUnit, { lihatSemua: '#/materi', sub: 'Tonton berurutan, satu ide setiap kartu' }),
       barisKartu('🔥 Arena Games', kartuGames, { lihatSemua: '#/games', kelas: 'rel-lebar', sub: 'Paling seru minggu ini' }),
       barisKartu('Misi Literasi', posterLit, { lihatSemua: '#/literasi', sub: 'Pecahkan masalah sehari-hari' }),
@@ -119,10 +120,6 @@ export function tampil(root) {
             l === berikut ? h('span', { class: 'peta-kamu' }, 'Kamu di sini') : null,
             l.selesai ? h('span', { class: 'sr-only' }, '(selesai)') : null))))),
 
-      h('section', { class: 'baris teman-bagian' },
-        h('header', { class: 'baris-kepala' }, h('div', {}, h('h2', {}, 'Teman Seperjalanan'), h('p', { class: 'baris-sub' }, 'Ketuk mereka, ya! 👆'))),
-        maskot({ kecil: true })),
-
       kartuPasang(),
 
       h('div', { class: 'kartu kartu-tips' },
@@ -133,6 +130,27 @@ export function tampil(root) {
           h('li', {}, 'Musik bisa dimatikan lewat tombol 🎵 di atas.'),
           h('li', {}, 'Selesai belajar? Main games untuk istirahat sambil berlatih! 🎮')))),
   );
+}
+
+// Ari menyambut dan memperkenalkan Teman Belajar (Ari = pemandu khusus Beranda)
+function sambutanAri(berikut) {
+  const elAri = h('div', { class: 'sambutan-ari-gambar', html: ari({ ukuran: 78 }) });
+  elAri.addEventListener('click', () => {
+    const s = elAri.querySelector('.ari');
+    s.classList.remove('ari-loncat'); void s.getBoundingClientRect(); s.classList.add('ari-loncat');
+    efek('boing');
+  });
+  return h('section', { class: 'sambutan', 'aria-labelledby': 'judul-sambutan' },
+    h('div', { class: 'sambutan-kepala' },
+      elAri,
+      h('div', { class: 'sambutan-gelembung' },
+        h('p', { class: 'sambutan-judul', id: 'judul-sambutan' }, 'Hai! Aku Ari! Selamat datang di DeretKu! ✨'),
+        h('p', {}, 'Di sini kamu nggak akan belajar sendirian. Aku punya teman-teman yang siap menemanimu belajar, bermain, dan menyelesaikan berbagai tantangan matematika.'),
+        h('p', {}, 'Yuk, belajar bersama teman-temanku dan jelajahi Negeri Aritmatika!'))),
+    h('div', { class: 'sambutan-teman' }, Object.keys(TEMAN).map((id, i) => h('figure', { class: 'teman-kartu', style: `--i:${i}` },
+      gambarTeman(id),
+      h('figcaption', {}, h('strong', {}, TEMAN[id].nama), h('small', {}, `Menemanimu di ${peranTeman(id)}`))))),
+    h('a', { class: 'btn-hero utama sambutan-tombol', href: berikut ? berikut.href : '#/materi' }, '🚀 Yuk, Mulai Petualangan!'));
 }
 
 function kartuPasang() {

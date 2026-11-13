@@ -3,6 +3,7 @@ import { ambil, aturLevel, catatLatihan } from '../state.js';
 import { efek, hentikanNarasi } from '../audio.js';
 import { JENIS, NAMA_LEVEL, buatSoal, bacaJawaban } from '../generator.js';
 import { bannerDunia } from '../dunia.js';
+import { temanBelajar } from '../teman.js';
 
 const NAIK_SETELAH = 3; // benar berturut-turut tanpa petunjuk
 const TURUN_SETELAH = 2; // salah berturut-turut
@@ -11,7 +12,7 @@ const TURUN_SETELAH = 2; // salah berturut-turut
 export function tampilDaftar(root) {
   const d = ambil();
   root.append(
-    bannerDunia('latihan', 'Latihan Adaptif', 'Soal acak tanpa batas waktu. Level naik otomatis!', 'Pelan-pelan saja 🌱'),
+    bannerDunia('latihan', 'Latihan Adaptif', 'Soal acak tanpa batas waktu. Level naik otomatis!', 'Semangat! Kita latihan bareng ✏️'),
     h('p', { class: 'kecil muted' }, 'Jawab benar 3 kali berturut-turut tanpa petunjuk untuk naik level.'),
     h('div', { class: 'daftar' }, JENIS.map((j) => {
       const riwayat = d.latihan.filter((l) => l.jenis === j.id);
@@ -42,7 +43,10 @@ export function tampilSesi(root, [jenis]) {
   const area = h('div');
   const bawah = h('div', { class: 'tumpuk-tombol' },
     h('button', { class: 'btn btn-ghost', onclick: selesai }, 'Selesai latihan'));
-  root.append(kepala, area, bawah);
+  const teman = temanBelajar('latihan', 'Semangat! Coba perhatikan pola bilangan pada soal ini, ya!', { tenang: true, kelas: 'teman-bawah' });
+  const SAPA_MULAI = ['Semangat! Coba perhatikan pola bilangan pada soal ini, ya!', 'Soal baru! Cari dulu a dan b-nya 🔍', 'Pelan-pelan saja, tidak ada batas waktu 🌱', 'Butuh bantuan? Ada tombol 💡 Petunjuk, lho!'];
+  const SAPA_BENAR = ['Mantap! Jawabanmu benar! 🎉', 'Keren! Kamu makin jago! ⭐', 'Yes! Tepat sekali! 🙌'];
+  root.append(kepala, area, teman, bawah);
 
   function renderKepala() {
     const titik = Array.from({ length: NAIK_SETELAH }, (_, k) => h('span', { class: `titik ${k < beruntun ? 'isi' : ''}` }));
@@ -63,6 +67,7 @@ export function tampilSesi(root, [jenis]) {
     tuntas = false;
     mulai = Date.now();
     render();
+    if (dijawab > 0) teman.bicara(SAPA_MULAI[dijawab % SAPA_MULAI.length]);
   }
 
   function render() {
@@ -120,14 +125,17 @@ export function tampilSesi(root, [jenis]) {
       percobaan++;
       if (benar) {
         efek('benar');
+        teman.bicara(percobaan === 1 ? SAPA_BENAR[dijawab % SAPA_BENAR.length] : 'Bagus! Kamu berhasil memperbaikinya! 💪', 'senang');
         akhiri(percobaan === 1);
         umpan.replaceChildren(kotakUmpan(true, percobaan === 1 ? 'Mantap!' : 'Bagus, kamu berhasil memperbaikinya!'), pembahasan());
       } else if (percobaan < 2) {
         efek('salah');
+        teman.bicara('Tidak apa-apa, salah itu bagian dari belajar! Coba buka 💡 Petunjuk, ya 😊', 'semangat');
         umpan.replaceChildren(kotakUmpan(false, 'Coba periksa lagi langkahmu. Butuh bantuan? Buka <strong>💡 Petunjuk</strong>.'));
         input.select();
       } else {
         efek('salah');
+        teman.bicara('Ayo kita pelajari pembahasannya bersama. Soal berikutnya pasti bisa! 🌟', 'semangat');
         akhiri(false);
         umpan.replaceChildren(kotakUmpan(false, `Jawaban yang benar adalah <strong>${fmt(soal.jawaban)}</strong>. Pelajari langkahnya:`), pembahasan(true));
       }
@@ -156,6 +164,7 @@ export function tampilSesi(root, [jenis]) {
         if (beruntun >= NAIK_SETELAH && level < 3) {
           level++; beruntun = 0; aturLevel(jenis, level);
           toast(`🚀 Naik ke level ${NAMA_LEVEL[level]}!`);
+          teman.bicara(`Wah, kamu naik ke level ${NAMA_LEVEL[level]}! Hebat! 🚀`, 'senang');
           efek('selesai');
         }
       } else if (!benarPertama) {

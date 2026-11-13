@@ -902,6 +902,80 @@ body.mode-sinema .maskot-svg ellipse[fill="#00000018"] { fill: #00000055; }
 .grid-game .kartu-lebar { width: auto; }
 .game-item > p { margin: 8px 0 0 52px; }
 .grid-game .peringkat { color: var(--bg); -webkit-text-stroke: 3px #e879f9; }
+/* ============================================================ TEMAN BELAJAR (v1.3) */
+/* Gambar asli dari pengguna: tidak diubah, rasio dijaga (height:auto), dibingkai putih kecil. */
+.teman { display: flex; align-items: flex-end; gap: 10px; margin: 16px 0 6px; animation: teman-masuk .5s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes teman-masuk { from { opacity: 0; transform: translateY(12px); } }
+.teman-gambar {
+  position: relative; flex: none; width: 72px; padding: 4px; border-radius: 16px; background: #fff;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, .18); border: 2px solid #f5d0fe;
+}
+.teman-gambar.bentuk-lebar { width: 104px; }
+.teman-gambar img { display: block; width: 100%; height: auto; border-radius: 11px; user-select: none; -webkit-user-drag: none; }
+.kilau-teman { position: absolute; pointer-events: none; line-height: 1; animation: kerlip 2.4s ease-in-out infinite; }
+.kilau-teman.k1 { top: -9px; right: -7px; font-size: 16px; color: #facc15; text-shadow: 0 0 6px rgba(250, 204, 21, .7); }
+.kilau-teman.k2 { bottom: -6px; left: -6px; font-size: 12px; color: #ec4899; animation-delay: 1.2s; }
+.teman:not(.tenang) .teman-gambar, .melayang-teman { animation: melayang-teman 3.4s ease-in-out infinite; }
+@keyframes melayang-teman { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.teman.senang .teman-gambar { animation: lompat-senang .6s cubic-bezier(.3, 1.5, .5, 1); }
+@keyframes lompat-senang { 40% { transform: translateY(-12px); } }
+.teman.tenang .kilau-teman { animation: none; opacity: .85; }
+
+.teman-gelembung {
+  position: relative; flex: 1; min-width: 0; margin-bottom: 8px;
+  background: var(--surface); color: var(--text); border: 2px solid #f0abfc; border-radius: 16px 16px 16px 4px;
+  padding: 8px 12px; font-size: .88em; line-height: 1.4; box-shadow: var(--shadow);
+}
+.teman-gelembung::before {
+  content: ""; position: absolute; left: -9px; bottom: 8px; width: 12px; height: 12px;
+  background: var(--surface); border-left: 2px solid #f0abfc; border-bottom: 2px solid #f0abfc; transform: rotate(45deg);
+}
+.teman-nama { display: block; font-family: "Fredoka", system-ui, sans-serif; font-weight: 700; font-size: .78em; color: var(--primary); letter-spacing: .3px; }
+.teman.bicara-baru .teman-gelembung { animation: pop .32s cubic-bezier(.3, 1.6, .5, 1); }
+.teman.senang .teman-gelembung { border-color: #86efac; }
+.teman.senang .teman-gelembung::before { border-color: #86efac; }
+.teman.semangat .teman-gelembung { border-color: #fcd34d; }
+.teman.semangat .teman-gelembung::before { border-color: #fcd34d; }
+.teman-bawah { margin-top: 18px; }
+.teman-tengah { max-width: 420px; margin: 14px auto; text-align: left; }
+.teman-di-warna .teman-gelembung { color: #2a1840; background: #fff; }
+.teman-di-warna .teman-gelembung::before { background: #fff; }
+.teman-di-warna .teman-nama { color: #a21caf; }
+
+/* banner halaman: bingkai foto kecil, sedikit miring */
+.banner-teman { position: absolute; right: 12px; bottom: 12px; }
+.banner-teman .teman-gambar { width: 82px; transform: rotate(-3deg); border-color: rgba(255, 255, 255, .9); box-shadow: 0 10px 22px rgba(0, 0, 0, .25); }
+.banner-teman .teman-gambar.bentuk-lebar { width: 104px; }
+.banner-teman .melayang-teman { animation-name: melayang-miring; }
+@keyframes melayang-miring { 0%, 100% { transform: rotate(-3deg) translateY(0); } 50% { transform: rotate(-3deg) translateY(-5px); } }
+.banner-gelembung { max-width: 150px; font-size: .72em; }
+
+/* Beranda: sambutan Ari + perkenalan teman */
+.sambutan {
+  margin: 6px 16px 4px; padding: 16px; border-radius: 24px; position: relative;
+  background: linear-gradient(135deg, rgba(240, 171, 252, .14), rgba(124, 58, 237, .2));
+  border: 1px solid var(--border);
+}
+.sambutan-kepala { display: flex; align-items: flex-start; gap: 8px; }
+.sambutan-ari-gambar { flex: none; cursor: pointer; margin-top: 4px; filter: drop-shadow(0 6px 14px rgba(236, 72, 153, .45)); }
+.sambutan-gelembung {
+  background: #fff; color: #2a1840; border-radius: 6px 18px 18px 18px; padding: 12px 14px; font-size: .9em; line-height: 1.5;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .25); animation: naik-pelan .6s cubic-bezier(.2, .8, .2, 1) both;
+}
+.sambutan-gelembung p { margin: 0 0 6px; }
+.sambutan-gelembung p:last-child { margin: 0; }
+.sambutan-judul { font-family: "Fredoka", system-ui, sans-serif; font-weight: 700; font-size: 1.08em; color: #a21caf; }
+.sambutan-teman { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0 14px; align-items: start; }
+.teman-kartu { margin: 0; text-align: center; animation: kartu-masuk-bawah .5s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(.2s + var(--i, 0) * 90ms); }
+.teman-kartu .teman-gambar, .teman-kartu .teman-gambar.bentuk-lebar { width: 100%; max-width: 92px; margin: 0 auto; animation: melayang-teman 3.4s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -.6s); }
+.teman-kartu figcaption { margin-top: 6px; line-height: 1.2; }
+.teman-kartu strong { display: block; font-family: "Fredoka", system-ui, sans-serif; font-size: .76em; }
+.teman-kartu small { display: block; font-size: .62em; color: var(--muted); margin-top: 2px; }
+.sambutan-tombol { width: 100%; }
+@media (min-width: 700px) { .sambutan-teman { max-width: 520px; } }
+
+html[data-animasi="mati"] .teman *, html[data-animasi="mati"] .teman, html[data-animasi="mati"] .teman-kartu *, html[data-animasi="mati"] .banner-teman * { animation: none !important; }
+
 /* ------------------------------------------------------------ animasi (hormati preferensi) */
 .muncul { animation: naik .25s ease; }
 @keyframes naik { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }

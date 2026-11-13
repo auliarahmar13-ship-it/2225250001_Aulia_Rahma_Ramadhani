@@ -138,7 +138,11 @@ mulai dari mana.
   tombol ▶ Mulai/Lanjutkan, dan progres petualangan.
 - **Baris poster horizontal** yang bisa digeser: Episode Materi, Arena Games (peringkat 1–3), Misi Literasi, Tantangan.
 - Ilustrasi poster "3D" (SVG isometrik, bola mengilap, roket, peti harta), tanpa gambar luar.
-- **Maskot Ari** (orisinal) di hero dan banner setiap halaman; disentuh akan melompat dan menyapa.
+- **Maskot Ari** (orisinal) sebagai pemandu di Beranda: menyambut dan memperkenalkan Teman Belajar.
+- **Teman Belajar** (v1.3): 4 ilustrasi siswa pilihan pengguna menemani setiap fitur secara bergantian
+  (Materi: Duo Pensil/Si Kutu Buku; Latihan: Si Kutu Buku/Geng SMP; Kuis: Geng SMP/Teman Sekolah;
+  Literasi: Teman Sekolah/Si Kutu Buku; Games: Duo Pensil/Geng SMP), dengan gelembung dialog yang
+  merespons jawaban benar/salah.
 - Banner "dunia" di setiap halaman daftar, transisi halaman halus, dan font Fredoka.
 - Semua fitur belajar (materi, latihan, literasi, kuis, skala beban, ekspor) tetap utuh.
 

@@ -81,6 +81,9 @@ kuis, dan setiap masalah literasi. Data dipakai untuk:
 
 ## 5. Gaya Visual
 
+- **Teman Belajar**: 4 karakter siswa menemani di setiap fitur (rasa belajar bersama teman sekolah).
+  Di halaman belajar karakter kecil, diam (tanpa melayang), dan diletakkan di bawah kartu agar tidak
+  menambah beban ekstrinsik; dialognya berupa dukungan dan petunjuk (umpan balik afektif).
 - **Dunia Belajar "Negeri Aritmatika"**: Beranda bergaya layanan streaming (hero sinematik + baris
   poster yang bisa digeser), maskot **Ari**, dan banner bertema di setiap halaman daftar. Tujuannya
   motivasi dan rasa ingin tahu. Halaman belajar (kartu materi, soal) tetap bersih tanpa animasi.

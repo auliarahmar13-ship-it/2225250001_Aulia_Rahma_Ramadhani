@@ -1,6 +1,6 @@
 import { h } from '../ui.js';
 import { ambil } from '../state.js';
-import { maskot } from '../maskot.js';
+import { temanBelajar } from '../teman.js';
 import { bannerDunia, kartuLebar } from '../dunia.js';
 import { posterGame } from '../ilustrasi.js';
 import * as balon from '../games/balon.js';
@@ -16,11 +16,11 @@ const GAMES = [
 export function tampilDaftar(root) {
   const p = ambil().permainan;
   root.append(
-    bannerDunia('games', 'Arena Games', 'Belajar sambil bermain! Kumpulkan bintang dan pecahkan rekormu.', 'Pilih game favoritmu! 🎉'),
+    bannerDunia('games', 'Arena Games', 'Belajar sambil bermain! Kumpulkan bintang dan pecahkan rekormu.', 'Ayo main bareng kami! 🎮'),
     h('div', { class: 'grid-game' }, GAMES.map((g, i) => h('div', { class: 'game-item' },
       kartuLebar({ href: `#/games/${g.id}`, ilustrasi: posterGame(g.id), judul: `${g.ikon} ${g.judul}`, sub: g.materi, peringkat: i + 1, rekor: p[g.id]?.rekor }),
       h('p', { class: 'kecil muted' }, g.ket)))),
-    maskot({ pesan: 'Ayo main bareng! 🎮', kecil: true }),
+    temanBelajar('games', 'Pilih game favoritmu, nanti kita main bareng! Kumpulkan 3 bintang, ya ⭐', { kelas: 'teman-bawah' }),
     h('p', { class: 'kecil muted tengah' }, 'Games bersifat santai. Untuk belajar terarah tanpa batas waktu, gunakan menu Latihan.'),
   );
 }

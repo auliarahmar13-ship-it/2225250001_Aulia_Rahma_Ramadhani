@@ -33,6 +33,9 @@ app/                    ROOT WEB: semua yang di-deploy ada di sini
   js/audio.js           Musik latar generatif, efek suara, narasi (TTS)
   js/ui.js              Helper DOM, toast, modal skala beban kognitif, visual SVG
   js/maskot.js          Maskot 4 siswa (SVG buatan sendiri) + animasi CSS, disentuh → melompat
+  js/ilustrasi.js       Ilustrasi "3D" SVG: adegan hero, poster episode/misi/games, maskot Ari
+  js/dunia.js           Komponen Dunia Belajar: banner halaman, baris kartu geser, poster, kartu lebar
+  fonts/                Fredoka (OFL, lihat OFL.txt) untuk judul & tombol
   js/games/*.js         Games: balon (Balon Pola), katak (Lompat Katak), susun (Menara Angka), umum
   js/generator.js       Pembuat soal latihan acak
   js/data/materi.js     Konten materi per unit (kartu)
@@ -75,8 +78,9 @@ Setiap fitur atau konten baru harus lolos daftar periksa ini:
 6. **Hindari split-attention**: label langsung di visual, bukan di legenda terpisah.
 7. **Hindari redundansi**: narasi membacakan teks kartu; jangan tambah teks lain yang mengulang.
 8. **Modalitas**: narasi suara tersedia, tetapi tidak dipaksa.
-9. **Tanpa batas waktu** di kuis/latihan. Animasi dekoratif (maskot, konfeti) **hanya** di Beranda,
-   Games, dan layar selesai. **Jangan** di kartu materi atau soal. Animasi bisa dimatikan
+9. **Tanpa batas waktu** di kuis/latihan. Animasi dekoratif (maskot, Ari, hero, banner dunia,
+   konfeti) **hanya** di Beranda, banner halaman daftar, Games, dan layar selesai. **Jangan** di
+   kartu materi atau soal. Animasi di dalam poster hanya berjalan saat disorot (hemat CPU HP). Animasi bisa dimatikan
    (Saya → Animasi maskot) dan otomatis mati bila `prefers-reduced-motion`.
 10. **Umpan balik langsung** dan menjelaskan *mengapa*, bukan hanya benar/salah.
 
@@ -89,6 +93,19 @@ Setiap fitur atau konten baru harus lolos daftar periksa ini:
   berkas musik berhak cipta.
 - Jangan memakai gambar stok bertanda air/berlisensi (mis. Pngtree). Gambar harus buatan sendiri
   atau berlisensi bebas yang jelas.
+
+## Gaya "Dunia Belajar" (v1.2)
+
+- Beranda bergaya layanan streaming: banner hero sinematik (mode gelap `body.mode-sinema`),
+  baris poster horizontal (`barisKartu`, `poster`, `kartuLebar` di `js/dunia.js`).
+- Setiap halaman daftar diawali `bannerDunia(tema, …)`: materi = Perpustakaan Ajaib,
+  latihan = Hutan Latihan, literasi = Kota Cerita, kuis = Arena Juara, games = Taman Bermain.
+- Maskot utama **Ari** (makhluk bintang, `ari()` di `js/ilustrasi.js`); 4 siswa tetap ada di
+  "Teman Seperjalanan".
+- Transisi halaman memakai View Transitions API **dengan pengaman 400 ms** di `app.js`
+  (jangan hapus: di sebagian browser callback transisi tidak dijalankan).
+- Hindari nama variabel yang menimpa variabel luar (mis. `m` untuk maskot di dalam fungsi yang
+  sudah memakai `m`). Bug ini pernah membuat misi literasi gagal tersimpan.
 
 ## Aturan Literasi Matematika
 

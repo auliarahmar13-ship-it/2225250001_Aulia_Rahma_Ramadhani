@@ -2,6 +2,7 @@ import { h, visualBarisan, tombolNarasi, kotakUmpan, tanyaBeban, toast, fmt } fr
 import { ambil, aturLevel, catatLatihan } from '../state.js';
 import { efek, hentikanNarasi } from '../audio.js';
 import { JENIS, NAMA_LEVEL, buatSoal, bacaJawaban } from '../generator.js';
+import { bannerDunia } from '../dunia.js';
 
 const NAIK_SETELAH = 3; // benar berturut-turut tanpa petunjuk
 const TURUN_SETELAH = 2; // salah berturut-turut
@@ -10,8 +11,8 @@ const TURUN_SETELAH = 2; // salah berturut-turut
 export function tampilDaftar(root) {
   const d = ambil();
   root.append(
-    h('h1', {}, '✏️ Latihan'),
-    h('p', { class: 'muted' }, 'Soal dibuat acak dan tidak ada batas waktu. Level naik otomatis jika kamu menjawab benar 3 kali berturut-turut tanpa petunjuk.'),
+    bannerDunia('latihan', 'Latihan Adaptif', 'Soal acak tanpa batas waktu. Level naik otomatis!', 'Pelan-pelan saja 🌱'),
+    h('p', { class: 'kecil muted' }, 'Jawab benar 3 kali berturut-turut tanpa petunjuk untuk naik level.'),
     h('div', { class: 'daftar' }, JENIS.map((j) => {
       const riwayat = d.latihan.filter((l) => l.jenis === j.id);
       const benar = riwayat.filter((l) => l.benar).length;

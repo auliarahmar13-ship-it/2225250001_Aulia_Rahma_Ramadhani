@@ -3,20 +3,18 @@ import { ambil, catatLiterasi, tandaiLiterasi } from '../state.js';
 import { efek, hentikanNarasi } from '../audio.js';
 import { LITERASI, TAHAP, cariLiterasi } from '../data/literasi.js';
 import { maskot, sorak } from '../maskot.js';
+import { bannerDunia, poster } from '../dunia.js';
+import { posterLiterasi } from '../ilustrasi.js';
 
 export function tampilDaftar(root) {
   const d = ambil();
   root.append(
-    h('h1', {}, '📖 Literasi Matematika'),
-    h('p', { class: 'muted' }, 'Selesaikan masalah sehari-hari dengan 4 tahap:'),
+    bannerDunia('literasi', 'Misi Literasi', 'Pecahkan masalah sehari-hari dengan 4 tahap.', 'Siap menjalankan misi? 🕵️'),
     h('ol', { class: 'tahap-ringkas' }, TAHAP.map((t) => h('li', {}, h('span', { 'aria-hidden': 'true' }, t.ikon), ' ', h('strong', {}, t.nama), ` (${t.ket})`))),
-    h('div', { class: 'daftar' }, LITERASI.map((l) => {
-      const selesai = !!d.literasiSelesai[l.id];
-      return h('a', { class: `kartu item-daftar ${selesai ? 'selesai' : ''}`, href: `#/literasi/${l.id}` },
-        h('span', { class: 'item-ikon', 'aria-hidden': 'true' }, l.ikon),
-        h('span', { class: 'item-teks' }, h('span', { class: 'tebal' }, l.judul), h('span', { class: 'kecil muted' }, `Konteks ${l.konteks}`)),
-        h('span', { class: `lencana ${selesai ? 'lencana-ok' : ''}` }, selesai ? '✓ Selesai' : '4 tahap'));
-    })),
+    h('div', { class: 'grid-poster' }, LITERASI.map((l, i) => poster({
+      href: `#/literasi/${l.id}`, ilustrasi: posterLiterasi(l.id, i), judul: l.judul, label: `Misi ${i + 1}`,
+      sub: `Konteks ${l.konteks} · 4 tahap`, selesai: !!d.literasiSelesai[l.id],
+    }))),
   );
 }
 
@@ -86,10 +84,10 @@ export function tampilMasalah(root, [id]) {
     await tanyaBeban(`literasi:${m.id}`, m.judul);
     const berikut = LITERASI[LITERASI.indexOf(m) + 1];
     const menit = Math.max(1, Math.round((Date.now() - mulaiWaktu) / 60000));
-    const m = maskot({ pesan: 'Masalah terpecahkan! 🌟', kecil: true });
-    setTimeout(() => sorak(m), 200);
+    const elMaskot = maskot({ pesan: 'Masalah terpecahkan! 🌟', kecil: true });
+    setTimeout(() => sorak(elMaskot), 200);
     const hasil = h('section', { class: 'kartu layar-selesai' },
-      m,
+      elMaskot,
       h('h2', {}, 'Masalah terpecahkan!'),
       h('p', {}, `Kamu sudah melewati keempat tahap dalam ±${menit} menit.`),
       h('p', { class: 'muted kecil' }, 'Ingat: memahami → merumuskan → menghitung → menafsirkan. Pakai langkah ini untuk setiap soal cerita.'),

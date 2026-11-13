@@ -81,6 +81,9 @@ kuis, dan setiap masalah literasi. Data dipakai untuk:
 
 ## 5. Gaya Visual
 
+- **Dunia Belajar "Negeri Aritmatika"**: Beranda bergaya layanan streaming (hero sinematik + baris
+  poster yang bisa digeser), maskot **Ari**, dan banner bertema di setiap halaman daftar. Tujuannya
+  motivasi dan rasa ingin tahu. Halaman belajar (kartu materi, soal) tetap bersih tanpa animasi.
 - Tema ceria **pink–ungu** (gradasi `#ff4fa3 → #c026d3 → #7c3aed`) agar menyenangkan bagi siswa SMP.
 - Warna sinyal: a = biru, b = oranye, n = ungu, Uₙ/Sₙ = hijau.
 - **Maskot**: 4 teman belajar (Raka, Dimas, Sari, Nia) berseragam sekolah, digambar sebagai SVG.

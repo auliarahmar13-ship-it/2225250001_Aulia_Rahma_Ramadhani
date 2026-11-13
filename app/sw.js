@@ -1,7 +1,7 @@
 // Service worker DeretKu: membuat aplikasi bisa dipasang dan berjalan offline.
 // NAIKKAN CACHE_VERSION setiap kali ada perubahan file di folder app/.
 
-const CACHE_VERSION = 'deretku-v1.1.0';
+const CACHE_VERSION = 'deretku-v1.2.0';
 
 const ASET = [
   './',
@@ -24,6 +24,9 @@ const ASET = [
   'js/views/saya.js',
   'js/views/games.js',
   'js/maskot.js',
+  'js/ilustrasi.js',
+  'js/dunia.js',
+  'fonts/fredoka-latin.woff2',
   'js/games/umum.js',
   'js/games/balon.js',
   'js/games/katak.js',

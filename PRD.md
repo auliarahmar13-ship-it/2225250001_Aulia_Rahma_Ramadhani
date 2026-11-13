@@ -132,6 +132,16 @@ mulai dari mana.
 - Tema pink–ungu, ikon gradasi pink–ungu, musik latar ceria.
 - Animasi dapat dimatikan dan otomatis mati bila pengguna memilih "kurangi gerakan".
 
+### F12 — Dunia Belajar Sinematik (v1.2)
+*Sebagai siswa, saya ingin aplikasi terasa seperti petualangan, bukan dasbor sekolah.*
+- **Beranda bergaya streaming**: banner hero "Negeri Aritmatika" (pulau melayang berangka 2, 5, 8, 11),
+  tombol ▶ Mulai/Lanjutkan, dan progres petualangan.
+- **Baris poster horizontal** yang bisa digeser: Episode Materi, Arena Games (peringkat 1–3), Misi Literasi, Tantangan.
+- Ilustrasi poster "3D" (SVG isometrik, bola mengilap, roket, peti harta), tanpa gambar luar.
+- **Maskot Ari** (orisinal) di hero dan banner setiap halaman; disentuh akan melompat dan menyapa.
+- Banner "dunia" di setiap halaman daftar, transisi halaman halus, dan font Fredoka.
+- Semua fitur belajar (materi, latihan, literasi, kuis, skala beban, ekspor) tetap utuh.
+
 ### F9 — Analisis Statistik (Python)
 - Statistik deskriptif skor kuis, tingkat kesukaran butir (p), daya beda (korelasi point-biserial), reliabilitas KR-20.
 - Frekuensi miskonsepsi, rata-rata beban kognitif per konteks, korelasi beban kognitif dengan skor.

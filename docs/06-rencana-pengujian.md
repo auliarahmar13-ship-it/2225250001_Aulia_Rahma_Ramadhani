@@ -24,6 +24,9 @@
 | UF18 | Matikan "Animasi maskot" | Maskot diam |
 | UF19 | Balon Pola: ketuk balon benar / salah / biarkan lolos | +poin & kombo / nyawa berkurang / nyawa berkurang; 0 nyawa → layar akhir |
 | UF20 | Lompat Katak: jawab benar & salah | Katak melompat tiap suku; benar → menang, salah → tercebur + penjelasan |
+| UF22 | Beranda: geser baris poster, ketuk poster Episode 1 | Baris tergeser mulus; halaman materi terbuka dengan transisi halus |
+| UF23 | Beranda: ketuk Ari / tombol 🗺️ Peta | Ari melompat & menyapa / halaman bergulir ke Peta Petualangan |
+| UF24 | Selesaikan misi literasi | Skala beban muncul; misi bertanda ✓ di poster |
 | UF21 | Menara Angka: ketuk penyusup | Balok bergoyang, pesan "penyusup"; 8 ronde → bintang & rekor tersimpan |
 
 ## 2. Uji Perangkat

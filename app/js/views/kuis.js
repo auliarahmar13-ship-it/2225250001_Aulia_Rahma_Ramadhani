@@ -1,6 +1,7 @@
 import { h, acakUrutan, tanyaBeban, batangProgres, konfirmasi, tombolNarasi } from '../ui.js';
 import { ambil, catatKuis } from '../state.js';
 import { efek, hentikanNarasi } from '../audio.js';
+import { bannerDunia } from '../dunia.js';
 
 let cacheBank = null;
 async function muatBank() {
@@ -16,7 +17,7 @@ export function tampil(root) {
   const terbaik = riwayat.length ? Math.max(...riwayat.map((k) => k.skor)) : null;
 
   root.append(
-    h('h1', {}, '🏆 Kuis'),
+    bannerDunia('kuis', 'Kuis Juara', 'Tunjukkan kemampuanmu di arena!', 'Kamu pasti bisa! 🏆'),
     h('div', { class: 'kartu' },
       h('ul', { class: 'info-kuis' },
         h('li', {}, '📝 15 soal pilihan ganda'),

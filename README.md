@@ -11,7 +11,8 @@ Android/iPhone tanpa Play Store/App Store**.
 | 📖 Literasi | 5 masalah kontekstual, 4 tahap (memahami → merumuskan → menghitung → menafsirkan) |
 | 🏆 Kuis | 15 soal, pembahasan, deteksi miskonsepsi |
 | 🎮 Games | Balon Pola, Lompat Katak, Menara Angka, lengkap dengan skor, bintang, dan rekor |
-| 🧒 Maskot | 4 teman belajar animasi yang bergoyang, melambai, dan melompat saat disentuh |
+| 🎬 Beranda sinematik | Banner "Negeri Aritmatika", baris poster 3D yang bisa digeser, maskot Ari |
+| 🧒 Maskot | Ari + 4 teman belajar animasi yang bergoyang, melambai, dan melompat saat disentuh |
 | 🎵 Suara | Musik latar ceria, efek suara, narasi (bisa dimatikan) |
 | 🧠 Beban kognitif | Skala Paas 1–9 setelah setiap bagian |
 | 📊 Python | Bank soal terverifikasi, analisis statistik (deskriptif, butir, KR-20, korelasi) |

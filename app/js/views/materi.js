@@ -3,25 +3,24 @@ import { ambil, aturPosisi, tandaiMateri } from '../state.js';
 import { efek, hentikanNarasi } from '../audio.js';
 import { UNIT, cariUnit } from '../data/materi.js';
 import { maskot, sorak } from '../maskot.js';
+import { bannerDunia, poster } from '../dunia.js';
+import { POSTER_UNIT } from '../ilustrasi.js';
 
 // ------------------------------------------------------------------ daftar unit
 export function tampilDaftar(root) {
   const d = ambil();
   root.append(
-    h('h1', {}, '📚 Materi'),
-    h('p', { class: 'muted' }, 'Pelajari secara berurutan. Setiap unit berisi kartu-kartu singkat, jadi kamu bisa berhenti kapan saja.'),
-    h('div', { class: 'daftar' }, UNIT.map((u, i) => {
+    bannerDunia('materi', 'Episode Materi', 'Setiap episode berisi kartu singkat. Kamu bisa berhenti kapan saja.', 'Pilih episode! 🎬'),
+    h('div', { class: 'grid-poster' }, UNIT.map((u, i) => {
       const selesai = !!d.materiSelesai[u.id];
       const posisi = d.posisiKartu[u.id] || 0;
-      const status = selesai ? '✓ Selesai' : posisi > 0 ? `Kartu ${posisi + 1}/${u.kartu.length}` : `${u.kartu.length} kartu · ±${u.menit} menit`;
-      return h('a', { class: `kartu item-daftar ${selesai ? 'selesai' : ''}`, href: `#/materi/${u.id}` },
-        h('span', { class: 'item-ikon', 'aria-hidden': 'true' }, u.ikon),
-        h('span', { class: 'item-teks' },
-          h('span', { class: 'kecil muted' }, `Unit ${i + 1} · ${u.tp}`),
-          h('span', { class: 'tebal' }, u.judul),
-          h('span', { class: 'kecil muted' }, u.ket)),
-        h('span', { class: `lencana ${selesai ? 'lencana-ok' : ''}` }, status));
+      return poster({
+        href: `#/materi/${u.id}`, ilustrasi: POSTER_UNIT[u.id](), judul: u.judul, label: `Episode ${i + 1} · ${u.tp}`,
+        sub: selesai ? '✓ Selesai, tonton ulang' : posisi > 0 ? `Kartu ${posisi + 1}/${u.kartu.length}` : `${u.kartu.length} kartu · ±${u.menit} menit`,
+        progres: selesai ? 1 : posisi ? posisi / u.kartu.length : null, selesai,
+      });
     })),
+    h('p', { class: 'kecil muted tengah' }, UNIT.map((u, i) => `${i + 1}. ${u.ket}`).join(' · ')),
   );
 }
 

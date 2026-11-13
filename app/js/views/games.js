@@ -1,6 +1,8 @@
 import { h } from '../ui.js';
 import { ambil } from '../state.js';
 import { maskot } from '../maskot.js';
+import { bannerDunia, kartuLebar } from '../dunia.js';
+import { posterGame } from '../ilustrasi.js';
 import * as balon from '../games/balon.js';
 import * as katak from '../games/katak.js';
 import * as susun from '../games/susun.js';
@@ -14,17 +16,11 @@ const GAMES = [
 export function tampilDaftar(root) {
   const p = ambil().permainan;
   root.append(
-    h('section', { class: 'game-hero' },
-      h('h1', {}, '🎮 Games Aritmatika'),
-      h('p', {}, 'Belajar sambil bermain! Kumpulkan bintang dan pecahkan rekormu.'),
-      maskot({ pesan: 'Pilih game favoritmu! 🎉', kecil: true })),
-    h('div', { class: 'daftar-game' }, GAMES.map((g) => h('a', { class: `kartu-game ${g.warna}`, href: `#/games/${g.id}` },
-      h('span', { class: 'kartu-game-ikon', 'aria-hidden': 'true' }, g.ikon),
-      h('span', { class: 'kartu-game-teks' },
-        h('span', { class: 'kartu-game-judul' }, g.judul),
-        h('span', { class: 'kartu-game-ket' }, g.ket),
-        h('span', { class: 'kartu-game-label' }, `📘 ${g.materi}`)),
-      h('span', { class: 'kartu-game-rekor' }, p[g.id]?.rekor ? `🏅 ${p[g.id].rekor}` : 'Baru!')))),
+    bannerDunia('games', 'Arena Games', 'Belajar sambil bermain! Kumpulkan bintang dan pecahkan rekormu.', 'Pilih game favoritmu! 🎉'),
+    h('div', { class: 'grid-game' }, GAMES.map((g, i) => h('div', { class: 'game-item' },
+      kartuLebar({ href: `#/games/${g.id}`, ilustrasi: posterGame(g.id), judul: `${g.ikon} ${g.judul}`, sub: g.materi, peringkat: i + 1, rekor: p[g.id]?.rekor }),
+      h('p', { class: 'kecil muted' }, g.ket)))),
+    maskot({ pesan: 'Ayo main bareng! 🎮', kecil: true }),
     h('p', { class: 'kecil muted tengah' }, 'Games bersifat santai. Untuk belajar terarah tanpa batas waktu, gunakan menu Latihan.'),
   );
 }

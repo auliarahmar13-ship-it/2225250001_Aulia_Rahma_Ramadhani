@@ -32,7 +32,30 @@ const tombolMusik = document.getElementById('tombol-musik');
 let bersihkan = null;
 let induk = '#/';
 
+// Transisi halus antarhalaman (View Transitions API), dengan cadangan animasi CSS
+function boleBergerak() {
+  return ambil().pengaturan.animasi !== false && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+let renderPertama = true;
 function render() {
+  if (!renderPertama && boleBergerak() && document.startViewTransition) {
+    // Pengaman: jika browser tidak menjalankan callback transisi, gambar tetap dilakukan
+    let sudah = false;
+    const jalankan = () => { if (sudah) return; sudah = true; gambar(); };
+    try {
+      const vt = document.startViewTransition(jalankan);
+      vt.updateCallbackDone.catch((e) => console.error('Render gagal:', e));
+      vt.finished.catch(() => {});
+    } catch (e) { jalankan(); }
+    setTimeout(jalankan, 400);
+  } else {
+    gambar();
+    if (!renderPertama && boleBergerak()) { main.classList.remove('masuk'); void main.offsetWidth; main.classList.add('masuk'); }
+  }
+  renderPertama = false;
+}
+
+function gambar() {
   if (typeof bersihkan === 'function') bersihkan();
   bersihkan = null;
   hentikanNarasi();
@@ -47,6 +70,8 @@ function render() {
   if (!cocok) { location.replace('#/'); return; }
 
   main.replaceChildren();
+  main.dataset.halaman = cocok.tab;
+  document.body.classList.toggle('mode-sinema', jalur === '/');
   judul.textContent = cocok.judul;
   document.title = cocok.judul === 'DeretKu' ? 'DeretKu: Barisan & Deret Aritmatika' : `${cocok.judul} · DeretKu`;
   induk = cocok.induk || '#/';
@@ -60,9 +85,14 @@ function render() {
   bersihkan = cocok.view(main, param) || null;
   window.scrollTo({ top: 0 });
   main.focus({ preventScroll: true });
+  perbaruiGulir();
 }
 
 tombolKembali.addEventListener('click', () => { location.hash = induk; });
+
+// Topbar transparan di atas banner Beranda, menjadi solid saat digulir
+const perbaruiGulir = () => document.body.classList.toggle('tergulir', window.scrollY > 24);
+window.addEventListener('scroll', perbaruiGulir, { passive: true });
 
 // ---- musik
 function perbaruiTombolMusik() {

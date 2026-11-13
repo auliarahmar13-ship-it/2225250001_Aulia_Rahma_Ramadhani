@@ -8,7 +8,7 @@ import { h } from './ui.js';
 export const TEMAN = {
   pensil: { src: 'img/teman/teman-naik-pensil.jpg', w: 268, h: 220, nama: 'Duo Pensil', alt: 'Dua siswa berseragam merah putih duduk di atas pensil besar', latar: 'putih' },
   buku: { src: 'img/teman/teman-membawa-buku.jpg', w: 220, h: 220, nama: 'Si Kutu Buku', alt: 'Siswa membawa tumpukan buku dan tas biru', latar: 'putih' },
-  kelompok: { src: 'img/teman/teman-kelompok-smp.jpg', w: 220, h: 220, nama: 'Geng SMP', alt: 'Empat siswa SMP berseragam putih biru membawa buku', latar: 'bingkai' },
+  kelompok: { src: 'img/teman/teman-kelompok-smp.jpg', w: 220, h: 220, nama: 'Sahabat SMP', alt: 'Empat siswa SMP berseragam putih biru membawa buku', latar: 'bingkai' },
   sekolah: { src: 'img/teman/teman-di-sekolah.jpg', w: 392, h: 220, nama: 'Teman Sekolah', alt: 'Empat siswa berdiri di depan sekolah', latar: 'bingkai' },
 };
 

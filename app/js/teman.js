@@ -14,6 +14,7 @@ export const TEMAN = {
 
 // Rotasi: setiap fitur punya karakter utama dan cadangan, bergantian tiap kali dibuka
 export const ROTASI = {
+  pemanasan: ['sekolah', 'pensil'],
   materi: ['pensil', 'buku'],
   latihan: ['buku', 'kelompok'],
   kuis: ['kelompok', 'sekolah'],
@@ -22,7 +23,7 @@ export const ROTASI = {
 };
 const hitungan = {};
 
-const NAMA_FITUR = { materi: 'Materi', latihan: 'Latihan', kuis: 'Kuis', literasi: 'Literasi', games: 'Games' };
+const NAMA_FITUR = { pemanasan: 'Pemanasan', materi: 'Materi', latihan: 'Latihan', kuis: 'Kuis', literasi: 'Literasi', games: 'Games' };
 // "Menemanimu di Materi & Games" (dihitung dari tabel rotasi)
 export function peranTeman(id) {
   const f = Object.keys(ROTASI).filter((k) => ROTASI[k].includes(id)).map((k) => NAMA_FITUR[k]);

@@ -1,9 +1,36 @@
 // Bagian bersama untuk semua games: layar mulai, layar akhir, konfeti, acak.
 
-import { h } from '../ui.js';
-import { ambil, catatPermainan } from '../state.js';
+import { h, acakUrutan } from '../ui.js';
+import { ambil, catatPermainan, catatJurnal } from '../state.js';
 import { efek } from '../audio.js';
 import { temanBelajar } from '../teman.js';
+import { REFLEKSI_GAME, cariFungsi } from '../data/rmt.js';
+
+// RMT Tahap 6: satu pertanyaan refleksi strategi di layar akhir → Jurnal RMT (hlm. 8, 88, 152).
+function kartuRefleksi(idGame) {
+  const pilihan = REFLEKSI_GAME[idGame.replace(/-teliti$/, '')];
+  if (!pilihan) return null;
+  const umpan = h('div', { 'aria-live': 'polite' });
+  const tombol = acakUrutan(pilihan).map((p) => h('button', {
+    class: 'opsi', type: 'button',
+    onclick: (e) => {
+      tombol.forEach((b) => { b.disabled = true; });
+      e.currentTarget.classList.add('dipilih');
+      catatJurnal({ konteks: `games:${idGame}`, fungsiKognitif: p.fungsi, refleksi: p.teks });
+      const nama = p.fungsi.map((k) => cariFungsi(k)).filter(Boolean).map((f) => `${f.ikon} ${f.namaSiswa}`);
+      // Refleksi tidak dinilai benar/salah (mediasi rasa mampu, hlm. 81) → judul netral
+      umpan.replaceChildren(h('div', { class: `umpan ${nama.length ? 'umpan-benar' : 'umpan-salah'}`, role: 'status' },
+        h('strong', {}, nama.length ? '🌟 Strategi bagus!' : '💡 Coba strategi ini lain kali'),
+        h('div', { html: nama.length
+          ? `Kamu memakai <strong>${nama.join('</strong> dan <strong>')}</strong>. Tersimpan di Jurnal RMT-mu.`
+          : 'Menebak kadang beruntung, tetapi belum pasti. Cari dulu bedanya: itulah bukti yang membuatmu yakin. Tersimpan di Jurnal RMT-mu.' })));
+      efek('buka');
+    },
+  }, p.teks));
+  return h('div', { class: 'refleksi-game' },
+    h('p', { class: 'tebal' }, '🪞 Bagaimana caramu menemukan jawaban?'),
+    h('div', { class: 'daftar-opsi' }, tombol), umpan);
+}
 
 export const acak = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 export const pilih = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -33,10 +60,17 @@ const AJAK = {
   susun: 'Ayo susun menaranya! Hati-hati, ada penyusup di antara balok 🕵️',
 };
 
-export function layarMulai(root, { id, judul, ikon, warna, cara, onMulai }) {
+// mode (opsional): [{ id, label, ket }] → satu tombol per mode; onMulai(modeId)
+export function layarMulai(root, { id, judul, ikon, warna, cara, onMulai, mode }) {
   const rekor = ambil().permainan[id]?.rekor || 0;
+  const tombolMulai = mode
+    ? mode.map((m, i) => h('button', {
+      class: `btn ${i === 0 ? 'btn-utama' : 'btn-sekunder'} btn-besar lebar`, 'data-mode': m.id,
+      onclick: () => { efek('selesai'); onMulai(m.id); },
+    }, m.label, m.ket ? h('span', { class: 'kecil', style: 'display:block;font-weight:500' }, m.ket) : null))
+    : [h('button', { class: 'btn btn-utama btn-besar lebar', onclick: () => { efek('selesai'); onMulai(); } }, '▶ Mulai Main!')];
   root.replaceChildren(
-    h('section', { class: `kartu game-mulai ${warna}` },
+    h('section', { class: `kartu game-mulai ${warna}` }, ...[
       h('div', { class: 'game-ikon-besar', 'aria-hidden': 'true' }, ikon),
       h('h1', {}, judul),
       rekor ? h('p', { class: 'rekor' }, `🏅 Rekormu: ${rekor}`) : null,
@@ -44,8 +78,8 @@ export function layarMulai(root, { id, judul, ikon, warna, cara, onMulai }) {
       h('div', { class: 'cara-main' },
         h('strong', {}, 'Cara main:'),
         h('ol', {}, cara.map((c) => h('li', { html: c })))),
-      h('button', { class: 'btn btn-utama btn-besar lebar', onclick: () => { efek('selesai'); onMulai(); } }, '▶ Mulai Main!'),
-      h('a', { class: 'btn btn-ghost lebar', href: '#/games' }, 'Pilih game lain')),
+      ...tombolMulai,
+      h('a', { class: 'btn btn-ghost lebar', href: '#/games' }, 'Pilih game lain')].filter(Boolean)),
   );
   window.scrollTo({ top: 0 });
 }
@@ -65,6 +99,7 @@ export function layarAkhir(root, { id, skor, bintang, ringkasan, onUlang }) {
       h('div', { class: 'skor-besar' }, String(skor)),
       h('p', { class: 'muted' }, ringkasan),
       m,
+      ...[kartuRefleksi(id)].filter(Boolean),
       h('div', { class: 'tumpuk-tombol' },
         h('button', { class: 'btn btn-utama btn-besar', onclick: onUlang }, '🔁 Main lagi'),
         h('a', { class: 'btn btn-sekunder', href: '#/games' }, '🎮 Game lain'),

@@ -15,6 +15,8 @@ Android/iPhone tanpa Play Store/App Store**.
 | 🧒 Maskot | Ari + 4 teman belajar animasi yang bergoyang, melambai, dan melompat saat disentuh |
 | 🎵 Suara | Musik latar ceria, efek suara, narasi (bisa dimatikan) |
 | 🧠 Beban kognitif | Skala Paas 1–9 setelah setiap bagian |
+| 🧩 Model RMT | Tes Awal, Pemanasan Berpikir, alat interaktif, "Apa yang ditanyakan?" & "Buktikan", tafsiran tertulis, Jurnal RMT, Kamus Fungsi Berpikir |
+| 🤖 Teman AI | Mediator RMT (Gemini lewat backend Python, model cadangan); butuh server |
 | 📊 Python | Bank soal terverifikasi, analisis statistik (deskriptif, butir, KR-20, korelasi) |
 
 ## Bahasa Pemrograman
@@ -53,3 +55,8 @@ Lihat [docs/07-panduan-deploy.md](docs/07-panduan-deploy.md) (GitHub Pages, grat
 - [PRD.md](PRD.md): kebutuhan produk
 - [CLAUDE.md](CLAUDE.md): panduan pengembang/AI
 - [docs/](docs/): analisis kebutuhan, desain pembelajaran, arsitektur, konten, rencana, pengujian, deploy
+- [docs/08-analisis-rmt.md](docs/08-analisis-rmt.md): analisis model Rigorous Mathematical Thinking (RMT) dan rencana implementasinya
+- [docs/09-rencana-hosting-pwa.md](docs/09-rencana-hosting-pwa.md): evaluasi PWA & hosting (diperbarui ke Vercel + Supabase di tahap hosting)
+- [docs/10-rubrik-rmt.md](docs/10-rubrik-rmt.md): rubrik analitik tulisan siswa (tafsiran & jurnal)
+- [docs/11-panduan-guru-mediator.md](docs/11-panduan-guru-mediator.md): panduan guru sebagai mediator RMT
+- [docs/12-lembar-validasi-ahli.md](docs/12-lembar-validasi-ahli.md): lembar validasi ahli materi, media, dan model RMT

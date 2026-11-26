@@ -4,28 +4,38 @@ Sumber kebenaran konten ada di `app/js/data/materi.js`, `app/js/data/literasi.js
 dan `python/generate_bank_soal.py`. Dokumen ini adalah ringkasan untuk validasi
 ahli materi.
 
+> **RMT Tahap 3** (docs/08 §9.3): setiap unit diawali kalimat **"💡 Mengapa ini penting?"**
+> (mediasi makna, hlm. 80). Kartu **🛠️ alat** dan **🌉 jembatan** ditandai di bawah. Ringkasan menampilkan
+> fungsi berpikir yang dilatih (`FUNGSI_UNIT` di `app/js/data/rmt.js`). Setiap kartu maksimal ±60 kata (diuji otomatis).
+
 ## Unit 1 — Pola Bilangan (Pemanasan) · TP1
 1. Apa itu pola bilangan: susunan bilangan dengan aturan tertentu (visual 2, 4, 6, 8).
 2. Pola dalam kehidupan: kursi di gedung (10, 12, 14, ...).
-3. Cek: bilangan berikutnya dari 3, 7, 11, 15 adalah ...
-4. Ringkasan.
+3. Contoh bertahap: menemukan aturan 5, 10, 15, 20.
+4. Cek: bilangan berikutnya dari 3, 7, 11, 15 adalah ...
+5. Ringkasan + fungsi berpikir (membandingkan, mencari dengan teratur, mencari yang tetap, membuat aturan umum).
 
 ## Unit 2 — Barisan Aritmatika · TP2
 1. Pengertian: selisih dua suku berurutan selalu sama, yang disebut **beda (b)**.
 2. Suku pertama ditulis **a** atau U₁ (visual 5, 8, 11, 14 dengan label +3).
-3. Contoh bertahap menentukan beda: b = U₂ − U₁.
-4. Beda negatif: barisan turun 20, 17, 14, ... (b = −3).
-5. Cek: manakah yang merupakan barisan aritmatika?
-6. Cek: beda dari 12, 9, 6, 3.
-7. Ringkasan.
+3. 🛠️ **Alat garis bilangan**: siswa melompat +3 dari 5 dan melihat lompatan yang sama panjang (B2, B1; hlm. 11, 58).
+4. Contoh bertahap menentukan beda: b = U₂ − U₁.
+5. Beda negatif: barisan turun 20, 17, 14, ... (b = −3).
+6. Cek: manakah yang merupakan barisan aritmatika?
+7. 🌉 **Jembatan**: 2, 5, 8, 11 (selisih tetap) dibandingkan dengan 2, 6, 18, 54 (dikali 3, bukan aritmatika) (hlm. 110).
+8. Cek: beda dari 12, 9, 6, 3.
+9. Ringkasan + fungsi berpikir.
 
 ## Unit 3 — Suku ke-n · TP3
 1. Masalah pemicu: suku ke-50 dari 5, 8, 11, ...? Menulis satu per satu melelahkan.
-2. Membangun rumus dari tabel: U₁ = a, U₂ = a + b, U₃ = a + 2b, ..., sehingga **Uₙ = a + (n − 1)b**.
-3. Contoh bertahap: U₅₀ dari 5, 8, 11, ... = 152.
-4. Contoh bertahap mencari banyak suku: 7, 11, 15, ..., 87, sehingga n = 21.
-5. Cek: U₁₀ dari 2, 5, 8, ... = 29.
-6. Ringkasan.
+2. 🛠️ **Alat tabel**: siswa mengisi kolom perubahan Uₙ (3, 3, 3), menemukan b tetap (C8), lalu **memilih
+   sendiri** rumus yang cocok untuk semua baris (C9). Pilihan salah diajak "uji pada U₂" (C4) (hlm. 152–154).
+3. Rumus **Uₙ = a + (n − 1)b**.
+4. Contoh bertahap: U₅₀ dari 5, 8, 11, ... = 152.
+5. Contoh bertahap mencari banyak suku: 7, 11, 15, ..., 87, sehingga n = 21.
+6. Cek: U₁₀ dari 2, 5, 8, ... = 29.
+7. 🌉 **Jembatan**: Uₙ = 3n + 2, naik tetap per langkah, disebut hubungan linear (fungsi dan grafik nanti) (hlm. 154).
+8. Ringkasan + fungsi berpikir.
 
 ## Unit 4 — Deret Aritmatika · TP4
 1. Pengertian deret: penjumlahan suku-suku barisan. Sₙ = jumlah n suku pertama.
@@ -33,7 +43,9 @@ ahli materi.
 3. Rumus: **Sₙ = n/2 (a + Uₙ)** atau **Sₙ = n/2 (2a + (n − 1)b)**.
 4. Contoh bertahap: S₁₀ dari 3, 7, 11, ... = 210.
 5. Cek: 1 + 2 + ... + 20 = 210.
-6. Ringkasan.
+6. Cek: total tabungan 10 hari, yaitu S₁₀ (bukan U₁₀).
+7. 🌉 **Jembatan**: selisih dari selisih Sₙ (2, 6, 12, 20 → 4, 6, 8 → 2, 2) tetap sebesar b (hlm. 184).
+8. Ringkasan + fungsi berpikir.
 
 ## Literasi Matematika · TP5
 

@@ -1,5 +1,7 @@
 // 🎈 Balon Pola: pecahkan balon yang berisi suku yang hilang dari barisan aritmatika.
-// Balon naik makin cepat seiring skor. 3 nyawa. Kombo memberi poin tambahan.
+// Mode Cepat: balon naik makin cepat seiring skor; kombo memberi poin tambahan. 3 nyawa.
+// Mode Teliti (RMT Tahap 6, presisi & proses, hlm. 4, 92): kecepatan tetap pelan, tanpa kombo,
+// bonus ketepatan di akhir. Rekor disimpan terpisah ('balon-teliti').
 
 import { h, fmt } from '../ui.js';
 import { efek } from '../audio.js';
@@ -27,8 +29,10 @@ export function tampil(root) {
   let rafId = null;
   let aktif = false;
 
-  const mulai = () => {
-    let skor = 0, nyawa = 3, kombo = 0, benarTotal = 0, ronde = 0;
+  const KECEPATAN_TELITI = 30; // px/detik, tetap
+  const mulai = (mode = 'cepat') => {
+    const teliti = mode === 'teliti';
+    let skor = 0, nyawa = 3, kombo = 0, benarTotal = 0, ronde = 0, keliru = 0;
     let soal, balon = [], waktuLalu = 0, jeda = false;
 
     const elSkor = h('span', { class: 'hud-skor' }, '0');
@@ -55,7 +59,7 @@ export function tampil(root) {
       const lebar = arena.clientWidth || 320;
       const tinggi = arena.clientHeight || 420;
       const lajur = lebar / soal.opsi.length;
-      const cepat = 38 + Math.min(skor, 400) * 0.22; // px/detik
+      const cepat = teliti ? KECEPATAN_TELITI : 38 + Math.min(skor, 400) * 0.22; // px/detik
       soal.opsi.forEach((nilai, i) => {
         const el = h('button', { class: `balon ${pilih(WARNA)}`, type: 'button', 'aria-label': `Balon ${fmt(nilai)}` }, h('span', {}, fmt(nilai)));
         arena.append(el);
@@ -73,10 +77,10 @@ export function tampil(root) {
         b.el.classList.add('pecah');
         efek('pop'); efek('benar');
         kombo++; benarTotal++;
-        const tambah = 10 + Math.min(kombo - 1, 5) * 2;
+        const tambah = teliti ? 10 : 10 + Math.min(kombo - 1, 5) * 2;
         skor += tambah;
         elSkor.textContent = String(skor);
-        elKombo.textContent = kombo >= 2 ? `🔥 Kombo ×${kombo}` : '';
+        elKombo.textContent = !teliti && kombo >= 2 ? `🔥 Kombo ×${kombo}` : teliti ? '🎯 Teliti' : '';
         tampilkanPoin(b, `+${tambah}`);
         elSoal.querySelector('.chip-tanya')?.replaceChildren(fmt(soal.jawab));
         elSoal.querySelector('.chip-tanya')?.classList.add('chip-benar');
@@ -86,7 +90,8 @@ export function tampil(root) {
         b.hidup = false;
         b.el.classList.add('salah-pecah');
         efek('salah');
-        kombo = 0; elKombo.textContent = '';
+        keliru++;
+        kombo = 0; elKombo.textContent = teliti ? '🎯 Teliti' : '';
         kurangiNyawa();
       }
     }
@@ -120,7 +125,8 @@ export function tampil(root) {
             b.hidup = false;
             if (b.nilai === soal.jawab) {
               efek('salah');
-              kombo = 0; elKombo.textContent = '';
+              keliru++;
+              kombo = 0; elKombo.textContent = teliti ? '🎯 Teliti' : '';
               elSoal.querySelector('.chip-tanya')?.replaceChildren(fmt(soal.jawab));
               kurangiNyawa();
               if (nyawa > 0) { jeda = true; setTimeout(() => { jeda = false; if (aktif) rondeBaru(); }, 900); }
@@ -134,14 +140,21 @@ export function tampil(root) {
     function selesai() {
       aktif = false;
       cancelAnimationFrame(rafId);
+      // Teliti: bonus ketepatan = 50 × (benar / (benar + keliru))
+      const ketepatan = benarTotal + keliru ? benarTotal / (benarTotal + keliru) : 0;
+      const bonus = teliti ? Math.round(50 * ketepatan) : 0;
+      skor += bonus;
       const bintang = skor >= 150 ? 3 : skor >= 80 ? 2 : skor >= 30 ? 1 : 0;
       setTimeout(() => layarAkhir(root, {
-        id: ID, skor, bintang,
-        ringkasan: `${benarTotal} balon benar dari ${ronde} barisan.`,
-        onUlang: mulai,
+        id: teliti ? `${ID}-teliti` : ID, skor, bintang,
+        ringkasan: teliti
+          ? `${benarTotal} balon benar dari ${ronde} barisan. Ketepatan ${Math.round(ketepatan * 100)}% → bonus +${bonus}.`
+          : `${benarTotal} balon benar dari ${ronde} barisan.`,
+        onUlang: () => mulai(mode),
       }), 500);
     }
 
+    if (teliti) elKombo.textContent = '🎯 Teliti';
     aktif = true;
     requestAnimationFrame(() => { rondeBaru(); rafId = requestAnimationFrame(langkah); });
   };
@@ -152,7 +165,11 @@ export function tampil(root) {
       'Lihat barisan aritmatika di atas. Ada satu suku yang hilang (<strong>?</strong>).',
       'Cari bedanya, lalu <strong>ketuk balon</strong> yang berisi angka yang benar.',
       'Jangan sampai balon yang benar terbang lolos! Kamu punya 3 ❤️.',
-      'Jawab benar berturut-turut untuk <strong>kombo 🔥</strong>. Balon akan makin cepat!',
+      '<strong>Mode Cepat</strong>: balon makin cepat, ada kombo 🔥. <strong>Mode Teliti</strong>: balon tetap pelan, ketepatan diberi bonus 🎯.',
+    ],
+    mode: [
+      { id: 'cepat', label: '▶ Mode Cepat', ket: 'Balon makin cepat, kejar kombo!' },
+      { id: 'teliti', label: '🎯 Mode Teliti', ket: 'Pelan dan tepat: hitung dulu bedanya' },
     ],
     onMulai: mulai,
   });

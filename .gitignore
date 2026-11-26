@@ -7,3 +7,9 @@ python/data_siswa/
 python/hasil/
 .DS_Store
 Thumbs.db
+# buku sumber RMT (berhak cipta), hanya untuk dibaca lokal, JANGAN diunggah ke GitHub
+docs/rmt/
+# rahasia (API key Gemini), JANGAN pernah diunggah ke GitHub
+.env
+.env.*
+!.env.example

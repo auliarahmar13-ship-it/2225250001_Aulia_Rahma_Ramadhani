@@ -4,6 +4,7 @@ import { h } from './ui.js';
 import { gambarTeman, pilihTeman } from './teman.js';
 
 const TEMA_DUNIA = {
+  pemanasan: { nama: 'Gerbang Berpikir', ikon: '🧠', kelas: 'dunia-materi' },
   materi: { nama: 'Perpustakaan Ajaib', ikon: '📚', kelas: 'dunia-materi' },
   latihan: { nama: 'Hutan Latihan', ikon: '🌳', kelas: 'dunia-latihan' },
   literasi: { nama: 'Kota Cerita', ikon: '🏙️', kelas: 'dunia-literasi' },

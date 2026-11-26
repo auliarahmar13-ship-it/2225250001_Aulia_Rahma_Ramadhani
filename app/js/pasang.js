@@ -19,7 +19,12 @@ export function bisaPasang() { return !!promptTertunda; }
 export function sudahTerpasang() {
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
-export function iOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent) && !sudahTerpasang(); }
+// iPad modern (iPadOS 13+) mengaku "Macintosh": kenali lewat layar sentuh (maxTouchPoints).
+export function iOS() {
+  const perangkatApple = /iphone|ipad|ipod/i.test(navigator.userAgent)
+    || (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+  return perangkatApple && !sudahTerpasang();
+}
 
 export async function pasang() {
   if (!promptTertunda) return false;

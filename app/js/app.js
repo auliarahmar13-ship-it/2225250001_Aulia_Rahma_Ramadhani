@@ -10,9 +10,13 @@ import * as kuis from './views/kuis.js';
 import * as literasi from './views/literasi.js';
 import * as saya from './views/saya.js';
 import * as games from './views/games.js';
+import * as pemanasan from './views/pemanasan.js';
+import * as pretes from './views/pretes.js';
 
 const RUTE = [
   { pola: /^\/$/, view: beranda.tampil, judul: 'DeretKu', tab: 'beranda' },
+  { pola: /^\/pretes$/, view: pretes.tampil, judul: 'Tes Awal', tab: 'kuis', induk: '#/' },
+  { pola: /^\/pemanasan$/, view: pemanasan.tampil, judul: 'Pemanasan', tab: 'materi', induk: '#/' },
   { pola: /^\/materi$/, view: materi.tampilDaftar, judul: 'Materi', tab: 'materi' },
   { pola: /^\/materi\/(\w+)$/, view: materi.tampilUnit, judul: 'Materi', tab: 'materi', induk: '#/materi' },
   { pola: /^\/latihan$/, view: latihan.tampilDaftar, judul: 'Latihan', tab: 'latihan' },

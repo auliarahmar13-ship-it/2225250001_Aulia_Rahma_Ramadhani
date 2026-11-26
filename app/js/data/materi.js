@@ -3,7 +3,11 @@
 //   teks      { judul, isi (html), visual? (array suku) }
 //   contoh    { judul, soal (html), langkah: [html] }   → langkah dibuka satu per satu
 //   cek       { judul, tanya (html), opsi: [teks], kunci (index), benar (html), salah (html) }
-//   ringkasan { judul, poin: [html] }
+//   ringkasan { judul, poin: [html] }  → ditambah daftar fungsi berpikir unit (rmt.js FUNGSI_UNIT)
+//   garis     { judul, isi (html), a, b, lompat }  → garis bilangan interaktif (RMT: alat khas matematika)
+//   tabel     { judul, isi (html), suku: [..], opsi: [html], kunci, kesimpulan (html) } → tabel interaktif
+//   teks + jembatan: true → kartu "🌉 Jembatan" (RMT transendensi, hlm. 78–79)
+// Kartu pertama tiap unit menampilkan "Mengapa ini penting?" dari rmt.js MAKNA_UNIT (hlm. 80).
 // Warna sinyal: .va = a, .vb = b, .vn = n, .vu = Uₙ / Sₙ
 
 const a = '<span class="va">a</span>';
@@ -54,7 +58,7 @@ export const UNIT = [
     ],
   },
   {
-    id: 'u2', judul: 'Barisan Aritmatika', ikon: '📏', tp: 'TP2', menit: 6,
+    id: 'u2', judul: 'Barisan Aritmatika', ikon: '📏', tp: 'TP2', menit: 8,
     ket: 'Mengenal suku pertama (a) dan beda (b)',
     kartu: [
       {
@@ -66,6 +70,10 @@ export const UNIT = [
         jenis: 'teks', judul: 'Suku dan suku pertama',
         isi: `<p>Setiap bilangan dalam barisan disebut <strong>suku</strong>. Suku ke-1 ditulis U<sub>1</sub>, suku ke-2 ditulis U<sub>2</sub>, dan seterusnya.</p><p>Suku pertama juga diberi nama ${a}. Pada barisan di bawah: ${a} = 5 dan ${b} = 3.</p>`,
         visual: [5, 8, 11, 14],
+      },
+      {
+        jenis: 'garis', judul: 'Alat: garis bilangan', a: 5, b: 3, lompat: 3,
+        isi: `<p>Garis bilangan adalah <strong>alat</strong> untuk melihat jarak antarsuku. Mulai dari ${a} = 5, tekan tombol untuk melompat sejauh ${b} = 3.</p>`,
       },
       {
         jenis: 'contoh', judul: 'Contoh: menentukan beda',
@@ -89,6 +97,10 @@ export const UNIT = [
         salah: 'Hitung selisih tiap pasangan suku. Pada barisan aritmatika, semua selisihnya harus sama.',
       },
       {
+        jenis: 'teks', jembatan: true, judul: 'Tidak semua pola itu aritmatika',
+        isi: `<p><strong>2, 5, 8, 11</strong>: selisihnya 3, 3, 3 (tetap). Ini barisan aritmatika.</p><p><strong>2, 6, 18, 54</strong>: setiap suku dikali 3. Selisihnya 4, 12, 36 (berubah), jadi <strong>bukan</strong> barisan aritmatika.</p><p>Kuncinya selalu sama: periksa apakah <strong>selisihnya tetap</strong>.</p>`,
+      },
+      {
         jenis: 'cek', judul: 'Cek Pemahaman',
         tanya: '<p>Beda dari barisan <strong>12, 9, 6, 3, ...</strong> adalah?</p>',
         opsi: ['3', '−3', '12', '9'], kunci: 1,
@@ -106,7 +118,7 @@ export const UNIT = [
     ],
   },
   {
-    id: 'u3', judul: 'Suku ke-n', ikon: '🎯', tp: 'TP3', menit: 8,
+    id: 'u3', judul: 'Suku ke-n', ikon: '🎯', tp: 'TP3', menit: 10,
     ket: `Rumus Uₙ = a + (n − 1)b`,
     kartu: [
       {
@@ -115,15 +127,12 @@ export const UNIT = [
         visual: [5, 8, 11, 14, '…'],
       },
       {
-        jenis: 'teks', judul: 'Menemukan rumus dari pola',
-        isi: `<p>Perhatikan berapa kali ${b} ditambahkan:</p>
-<table class="tabel-pola"><thead><tr><th>Suku</th><th>Nilai</th><th>Bentuk</th></tr></thead><tbody>
-<tr><td>U<sub>1</sub></td><td>5</td><td>${a}</td></tr>
-<tr><td>U<sub>2</sub></td><td>8</td><td>${a} + <span class="vb">1</span>${b}</td></tr>
-<tr><td>U<sub>3</sub></td><td>11</td><td>${a} + <span class="vb">2</span>${b}</td></tr>
-<tr><td>U<sub>4</sub></td><td>14</td><td>${a} + <span class="vb">3</span>${b}</td></tr>
-<tr><td>${Un}</td><td>?</td><td>${a} + (${n} − 1)${b}</td></tr></tbody></table>
-<p>Banyaknya ${b} selalu <strong>satu kurangnya</strong> dari urutan suku.</p>`,
+        // RMT: tabel sebagai alat (hlm. 152–154). Siswa mengisi perubahan Uₙ, lalu merumuskan sendiri.
+        jenis: 'tabel', judul: 'Menemukan rumus dari tabel', suku: [5, 8, 11, 14],
+        isi: `<p>Isi kolom <strong>perubahan</strong>: berapa ${Un} bertambah setiap ${n} naik 1?</p>`,
+        opsi: [`${Un} = ${a} + ${n} × ${b}`, `${Un} = ${a} + (${n} − 1) × ${b}`, `${Un} = ${n} × ${b}`],
+        kunci: 1,
+        kesimpulan: `U<sub>2</sub> = ${a} + <span class="vb">1</span>${b}, U<sub>3</sub> = ${a} + <span class="vb">2</span>${b}, U<sub>4</sub> = ${a} + <span class="vb">3</span>${b}. Banyaknya ${b} selalu <strong>satu kurangnya</strong> dari urutan suku.`,
       },
       {
         jenis: 'teks', judul: 'Rumus suku ke-n',
@@ -158,6 +167,10 @@ export const UNIT = [
         salah: 'Perhatikan: yang dikalikan dengan b adalah (n − 1), yaitu 9, bukan 10.',
       },
       {
+        jenis: 'teks', jembatan: true, judul: 'Rumus ini berlaku untuk semua suku',
+        isi: `<p>Untuk 5, 8, 11, ...: ${Un} = 5 + (${n} − 1) × 3 = <strong>3${n} + 2</strong>.</p><p>Setiap ${n} naik 1, ${Un} naik 3, yaitu sebesar ${b}. Hubungan "naik tetap setiap langkah" seperti ini disebut <strong>hubungan linear</strong>. Kamu akan menemuinya lagi saat belajar fungsi dan grafik garis lurus.</p>`,
+      },
+      {
         jenis: 'ringkasan', judul: 'Ringkasan',
         poin: [
           `Rumus suku ke-n: <strong>${Un} = ${a} + (${n} − 1)${b}</strong>.`,
@@ -168,7 +181,7 @@ export const UNIT = [
     ],
   },
   {
-    id: 'u4', judul: 'Deret Aritmatika', ikon: '➕', tp: 'TP4', menit: 8,
+    id: 'u4', judul: 'Deret Aritmatika', ikon: '➕', tp: 'TP4', menit: 9,
     ket: 'Jumlah n suku pertama (Sₙ)',
     kartu: [
       {
@@ -214,6 +227,16 @@ export const UNIT = [
         opsi: ['U₁₀ (suku ke-10)', 'S₁₀ (jumlah 10 suku)', 'Beda (b)', 'Suku pertama (a)'], kunci: 1,
         benar: 'Total = jumlah semua tabungan, jadi yang dihitung adalah deret S₁₀. U₁₀ hanya tabungan di hari ke-10.',
         salah: 'Kata "total" berarti menjumlahkan semuanya. Mana yang berarti jumlah?',
+      },
+      {
+        // RMT: "relasi antar-relasi" (hlm. 184)
+        jenis: 'teks', jembatan: true, judul: 'Selisih dari selisih',
+        isi: `<p>Deret 2 + 4 + 6 + 8 + ...</p>
+<table class="tabel-pola"><thead><tr><th>${n}</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead><tbody>
+<tr><td>${Sn}</td><td>2</td><td>6</td><td>12</td><td>20</td></tr>
+<tr><td>Selisih</td><td></td><td>4</td><td>6</td><td>8</td></tr>
+<tr><td>Selisih dari selisih</td><td></td><td></td><td class="vb">2</td><td class="vb">2</td></tr></tbody></table>
+<p>${Sn} bukan barisan aritmatika, tetapi <strong>selisih dari selisihnya tetap</strong>, yaitu sebesar ${b} = 2. Pola teratur tetap tersembunyi di dalamnya!</p>`,
       },
       {
         jenis: 'ringkasan', judul: 'Ringkasan',

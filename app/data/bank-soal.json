@@ -1,6 +1,6 @@
 {
   "versi": 1,
-  "dibuat": "2026-11-11",
+  "dibuat": "2026-11-25",
   "keterangan": "Dibuat otomatis oleh python/generate_bank_soal.py. Jangan diedit manual.",
   "miskonsepsi": {
     "M-n-bukan-n-1": "Memakai n, padahal seharusnya (n − 1) pada rumus Uₙ = a + (n − 1)b.",
@@ -19,6 +19,13 @@
     "M-selisih-berubah": "Tidak memeriksa bahwa selisih harus selalu sama.",
     "M-hitung": "Kesalahan operasi hitung."
   },
+  "pretes": [
+    "K02",
+    "K01",
+    "K04",
+    "K09",
+    "K12"
+  ],
   "soal": [
     {
       "id": "K01",

@@ -296,14 +296,23 @@ def validasi(soal: list[dict]) -> None:
         assert len(s["opsi"]) == 4, f"{s['id']}: harus 4 opsi"
 
 
+# Pretes RMT (asesmen dinamis format "sandwich", Kinard & Kozulin hlm. 60): 5 butir yang sama
+# dikerjakan sebelum Materi (pretes) dan di dalam kuis akhir (postes). Satu butir per TP1–TP5.
+PRETES = ["K02", "K01", "K04", "K09", "K12"]
+
+
 def bangun() -> dict:
     soal = buat_soal()
     validasi(soal)
+    ids = {s["id"]: s["indikator"] for s in soal}
+    assert all(i in ids for i in PRETES), "butir pretes tidak ada di bank soal"
+    assert sorted(ids[i] for i in PRETES) == ["TP1", "TP2", "TP3", "TP4", "TP5"], "pretes harus mencakup TP1–TP5"
     return {
         "versi": 1,
         "dibuat": date.today().isoformat(),
         "keterangan": "Dibuat otomatis oleh python/generate_bank_soal.py. Jangan diedit manual.",
         "miskonsepsi": MISKONSEPSI,
+        "pretes": PRETES,
         "soal": soal,
     }
 

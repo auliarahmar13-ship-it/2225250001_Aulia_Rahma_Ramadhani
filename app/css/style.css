@@ -259,6 +259,50 @@ a.kartu { text-decoration: none; }
 .tabel-pola th, .tabel-pola td { border: 1px solid var(--border); padding: 6px 8px; text-align: center; }
 .tabel-pola th { background: var(--surface-2); font-weight: 650; }
 
+/* RMT Tahap 7 (Saya): Jurnal RMT */
+.pilih-fungsi {
+  width: 100%; min-height: 44px; margin: 6px 0 4px; padding: 8px 10px; font: inherit;
+  border: 2px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text);
+}
+
+/* RMT Tahap 6 (Games): refleksi strategi di layar akhir */
+.refleksi-game { text-align: left; margin: 12px 0; padding: 12px; border-radius: 12px; background: var(--surface-2); }
+.refleksi-game .daftar-opsi { margin: 8px 0 4px; }
+
+/* RMT Tahap 5 (Literasi): tafsiran tertulis sebelum pilihan */
+.daftar-opsi[hidden] { display: none; }
+.tafsir-tulis { margin: 8px 0; }
+.input-tafsir {
+  width: 100%; min-height: 76px; padding: 10px 12px; margin: 4px 0 8px; resize: vertical;
+  border: 2px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); font: inherit;
+}
+.input-tafsir:focus { outline: none; border-color: var(--primary); }
+.input-tafsir:disabled { opacity: .75; }
+
+/* RMT Tahap 4 (Pemanasan Berpikir): model pola gambar & kotak jembatan */
+.model-pola { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 4px; padding: 12px; border-radius: 12px; background: var(--surface-2); }
+.model-baris { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.model-label { flex: none; min-width: 72px; font-size: .85em; font-weight: 700; color: var(--muted); }
+.model-isi { font-size: 1.35em; letter-spacing: .04em; line-height: 1.4; overflow-wrap: anywhere; }
+.kotak-jembatan { margin: 8px 0; padding: 10px 12px; border-radius: 12px; border: 2px dashed color-mix(in srgb, var(--ungu) 50%, var(--border)); }
+
+/* RMT Tahap 3 (Materi): makna unit, kartu jembatan, alat interaktif, fungsi berpikir */
+.makna-unit { background: var(--warn-soft); border-radius: 10px; padding: 8px 12px; margin: 0 0 10px; font-size: .92em; }
+.label-jembatan { font-size: .8em; font-weight: 700; color: var(--ungu); margin-bottom: 2px; }
+.kartu-jembatan { border: 2px dashed color-mix(in srgb, var(--ungu) 50%, var(--border)); }
+.wadah-tabel { overflow-x: auto; }
+.tabel-interaktif td { vertical-align: middle; }
+.input-sel {
+  width: 4.5em; min-height: 40px; padding: 4px 8px; text-align: center; font: inherit;
+  border: 2px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text);
+}
+.input-sel:focus { outline: none; border-color: var(--primary); }
+.input-sel.benar { border-color: var(--ok); background: var(--ok-soft); }
+.input-sel.salah { border-color: var(--err); background: var(--err-soft); }
+.baris-label { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
+.baris-label .label-fungsi { margin: 0; }
+.fungsi-unit { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
+
 /* warna sinyal variabel */
 .va { color: var(--c-a); font-weight: 700; }
 .vb { color: var(--c-b); font-weight: 700; }
@@ -299,7 +343,7 @@ a.kartu { text-decoration: none; }
 .opsi.dipilih .opsi-huruf { background: var(--primary); color: var(--primary-ink); }
 
 .umpan { border-radius: 12px; padding: 12px 14px; margin: 12px 0; }
-.umpan strong { display: block; margin-bottom: 2px; }
+.umpan > strong { display: block; margin-bottom: 2px; } /* hanya judul "✅ Benar!"; teks tebal di isi tetap sebaris */
 .umpan-benar { background: var(--ok-soft); }
 .umpan-salah { background: var(--warn-soft); }
 .umpan > div > p:last-child { margin-bottom: 0; }
@@ -325,6 +369,51 @@ a.kartu { text-decoration: none; }
 .titik-wadah { display: inline-flex; align-items: center; gap: 4px; }
 .titik { width: 10px; height: 10px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); display: inline-block; }
 .titik.isi { background: var(--ok); border-color: var(--ok); }
+
+/* Langkah RMT di Latihan (docs/08 Tahap 2): 1 Apa yang ditanyakan? → 2 Hitung → 3 Buktikan.
+   Satu langkah tampil setelah langkah sebelumnya selesai (segmentasi). */
+.langkah-rmt { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
+.langkah-rmt[hidden] { display: none; }
+.langkah-rmt > p { margin: 2px 0 0; }
+.langkah-rmt .daftar-opsi { margin: 10px 0 4px; }
+.langkah-rmt .umpan { margin-bottom: 4px; }
+.langkah-judul { font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.langkah-judul .tahap-no { flex: none; }
+.label-fungsi { margin-bottom: 8px; }
+
+/* Teman AI (js/ai.js): panel tertutup secara bawaan, satu jawaban per pertanyaan */
+.baris-tombol > .btn[hidden], .panel-ai[hidden] { display: none; }
+.panel-ai {
+  margin-top: 12px; padding: 12px 14px; border-radius: 12px;
+  border: 2px dashed color-mix(in srgb, var(--ungu) 55%, var(--border)); background: var(--surface);
+}
+.ai-ket { margin: 2px 0 4px; }
+.input-ai {
+  flex: 1; min-width: 0; min-height: 48px; padding: 10px 14px;
+  border: 2px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); font: inherit;
+}
+.input-ai:focus { outline: none; border-color: var(--primary); }
+.input-ai:disabled { opacity: .6; }
+.ai-memuat { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: var(--muted); }
+.ai-titik { display: inline-flex; gap: 4px; }
+.ai-titik i { width: 8px; height: 8px; border-radius: 50%; background: var(--ungu); animation: ai-denyut 1s ease-in-out infinite; }
+.ai-titik i:nth-child(2) { animation-delay: .15s; }
+.ai-titik i:nth-child(3) { animation-delay: .3s; }
+@keyframes ai-denyut { 0%, 80%, 100% { opacity: .3; transform: scale(.8); } 40% { opacity: 1; transform: scale(1); } }
+html[data-animasi="mati"] .ai-titik i { animation: none; opacity: .7; }
+.ai-percakapan { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.ai-percakapan:empty { display: none; }
+.ai-pesan { padding: 10px 14px; border-radius: 12px; max-width: 92%; }
+.ai-pesan-siswa { align-self: flex-end; background: var(--surface-2); border: 1px solid var(--border); }
+.ai-jawaban { align-self: flex-start; background: var(--primary-soft); }
+.ai-kepala { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ai-teks { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
+.ai-fungsi, .label-fungsi {
+  display: inline-block; margin-top: 8px; padding: 4px 10px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--border); font-size: .85em; font-weight: 600;
+}
+.ai-ulang { width: 100%; margin-top: 4px; }
+.ai-ulang[hidden] { display: none; }
 
 /* ------------------------------------------------------------ kuis */
 .info-kuis { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-direction: column; gap: 6px; }

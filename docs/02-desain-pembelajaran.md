@@ -2,6 +2,13 @@
 
 ## 1. Landasan Teori
 
+### Rigorous Mathematical Thinking (Kinard & Kozulin)
+Model pembelajaran utama. Ringkasan teori, fungsi kognitif, peran mediator, rencana, dan status
+penerapan ada di [08-analisis-rmt.md](08-analisis-rmt.md); rubrik di
+[10-rubrik-rmt.md](10-rubrik-rmt.md); panduan guru di [11-panduan-guru-mediator.md](11-panduan-guru-mediator.md).
+Teori beban kognitif dipakai untuk **mengurangi beban yang tidak perlu**, sedangkan RMT
+**mempertahankan tantangan berpikir yang bermakna** (bukti logis, menyusun alat, refleksi).
+
 ### Teori Beban Kognitif (Sweller, 1988; Sweller, van Merriënboer & Paas, 2019)
 Memori kerja terbatas (± 4 unsur informasi baru sekaligus). Beban kognitif terdiri atas:
 
@@ -34,19 +41,22 @@ berbagai konteks. DeretKu menyusun setiap masalah literasi menjadi 4 tahap:
 
 Konteks: personal (tabungan, olahraga), sosial (gedung pertunjukan), pekerjaan (toko), ilmiah (pola tumpukan).
 
-## 2. Alur Belajar
+## 2. Alur Belajar (selaras 3 fase RMT)
 
 ```
-Beranda
-  └─ Peta Belajar
-       1. Pola Bilangan (pemanasan)   ─┐
-       2. Barisan Aritmatika           │ Materi: kartu bersegmen + cek pemahaman
-       3. Suku ke-n                    │  → skala beban kognitif
-       4. Deret Aritmatika            ─┘
-       5. Latihan adaptif   (5 jenis × 3 level, petunjuk bertahap, contoh)
-       6. Literasi          (5 masalah × 4 tahap)
-       7. Kuis              (15 soal, pembahasan, analisis miskonsepsi)
-  └─ Games (kapan saja)     Balon Pola · Lompat Katak · Menara Angka
+Beranda (Peta Belajar, 9 langkah)
+  1. Tes Awal            5 butir kuis (TP1–TP5), tanpa umpan balik  ← asesmen dinamis "sandwich"
+  2. Pemanasan Berpikir  6 tugas pola gambar                         ← RMT Fase I Pengembangan Kognitif
+  3. Pola Bilangan      ─┐
+  4. Barisan Aritmatika  │ Materi: kartu bersegmen, alat (garis      ← RMT Fase II Konten sebagai Proses
+  5. Suku ke-n           │ bilangan, tabel), 🌉 jembatan, makna unit
+  6. Deret Aritmatika   ─┘ → skala beban kognitif
+  7. Latihan adaptif     Apa yang ditanyakan? → Hitung → Buktikan    ← RMT Fase III Praktik
+  8. Literasi            4 tahap PISA + tafsiran tertulis            ← RMT Fase III
+  9. Kuis                15 soal (memuat 5 butir Tes Awal)            ← bagian akhir "sandwich"
+  └─ Games (kapan saja)  Balon Pola (Mode Cepat/Teliti) · Lompat Katak · Menara Angka + refleksi
+  └─ Saya                Jurnal RMT · Kamus Fungsi Berpikir · Ekspor data
+  └─ Teman AI            mediator di Latihan & Literasi (butuh server)
 ```
 
 Siswa boleh membuka bagian mana pun (tidak dikunci), tetapi Beranda selalu

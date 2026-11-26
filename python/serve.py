@@ -4,6 +4,9 @@ Server lokal untuk menjalankan DeretKu saat pengembangan.
 - Melayani folder app/ dengan tipe MIME yang benar (penting di Windows, karena
   .js kadang dikenali sebagai text/plain sehingga modul JS gagal dimuat).
 - Menampilkan alamat IP LAN agar bisa dicoba dari HP pada Wi-Fi yang sama.
+- Endpoint Teman AI: POST /api/tanya (logika di api_tanya.py, sama dengan versi Vercel
+  di api/tanya.py). Gemini dipanggil DI SERVER (gemini.py), sehingga API key di .env tidak
+  pernah dikirim ke browser.
 
 Jalankan:  python python/serve.py            (port 8000)
            python python/serve.py --port 5500
@@ -13,15 +16,23 @@ from __future__ import annotations
 
 import argparse
 import functools
+import logging
 import socket
 import webbrowser
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+import gemini
+# Logika /api/tanya dipakai bersama dengan Vercel (api/tanya.py). Nama-nama ini diekspor ulang
+# agar kode/tes lama tetap bisa memakai serve.PembatasLaju, serve.MAKS_PER_IP, dst.
+import api_tanya
+from api_tanya import (ApiTanyaMixin, GalatApi, PembatasLaju, MAKS_BYTE_PERMINTAAN,  # noqa: F401
+                       MAKS_PER_IP, MAKS_TOTAL, JENDELA_LAJU)
+
 APP = Path(__file__).resolve().parent.parent / "app"
 
 
-class Handler(SimpleHTTPRequestHandler):
+class Handler(ApiTanyaMixin, SimpleHTTPRequestHandler):
     extensions_map = {
         **SimpleHTTPRequestHandler.extensions_map,
         ".js": "text/javascript",
@@ -38,6 +49,21 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Cache-Control", "no-cache")
         super().end_headers()
 
+    def do_GET(self) -> None:
+        if self._jalur().startswith("/api/"):
+            self.tolak_metode()
+            return
+        super().do_GET()
+
+    def do_HEAD(self) -> None:
+        if self._jalur().startswith("/api/"):
+            self.tolak_metode()
+            return
+        super().do_HEAD()
+
+    def do_POST(self) -> None:
+        self.layani_tanya()
+
 
 def ip_lan() -> str | None:
     try:
@@ -53,6 +79,8 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--tanpa-browser", action="store_true", help="jangan buka browser otomatis")
     args = parser.parse_args()
+    # Catatan Teman AI (model cadangan, kuota habis) tampil di terminal; tanpa kunci & isi pesan siswa.
+    logging.basicConfig(level=logging.INFO, format="[Teman AI] %(message)s")
 
     handler = functools.partial(Handler, directory=str(APP))
     server = ThreadingHTTPServer(("0.0.0.0", args.port), handler)
@@ -62,6 +90,13 @@ def main() -> None:
     ip = ip_lan()
     if ip:
         print(f"  HP (Wi-Fi sama): http://{ip}:{args.port}  (instal/offline hanya aktif di HTTPS/localhost)")
+    try:
+        gemini.ambil_kunci()
+        urut = gemini.daftar_model()
+        print(f"  Teman AI : aktif (POST /api/tanya, model {urut[0]}"
+              + (f"; cadangan: {', '.join(urut[1:])})" if len(urut) > 1 else ")"))
+    except gemini.GeminiError:
+        print("  Teman AI : nonaktif (isi GEMINI_API_KEY di .env)")
     print("Tekan Ctrl+C untuk berhenti.")
     if not args.tanpa_browser:
         webbrowser.open(lokal)

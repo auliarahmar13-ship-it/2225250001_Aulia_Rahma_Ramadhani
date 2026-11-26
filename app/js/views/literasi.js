@@ -5,6 +5,16 @@ import { LITERASI, TAHAP, cariLiterasi } from '../data/literasi.js';
 import { temanBelajar } from '../teman.js';
 import { bannerDunia, poster } from '../dunia.js';
 import { posterLiterasi } from '../ilustrasi.js';
+import { FUNGSI_LITERASI, cariFungsi } from '../data/rmt.js';
+import { panelTanyaAI } from '../ai.js';
+
+// RMT Tahap 5 (docs/08): fungsi berpikir tiap tahap + tafsiran TERTULIS sebelum pilihan di tahap
+// Menafsirkan (penjelasan tertulis, hlm. 167; bukti logis C2 & menghubungkan C5, hlm. 87).
+const MIN_TAFSIRAN = 10; // karakter: cukup untuk satu kalimat pendek
+function labelFungsi(kode) {
+  const f = cariFungsi(kode);
+  return f ? h('span', { class: 'label-fungsi', title: `${f.kode} · ${f.nama} (${f.istilahAsli})` }, `${f.ikon} ${f.namaSiswa}`) : null;
+}
 
 export function tampilDaftar(root) {
   const d = ambil();
@@ -37,10 +47,13 @@ export function tampilMasalah(root, [id]) {
 
   let indeks = 0;
   const mulaiWaktu = Date.now();
+  let ai = null;
 
   function tampilTahap() {
     const t = m.tahap[indeks];
     const info = TAHAP[indeks];
+    const menafsirkan = info.nama === 'Menafsirkan';
+    let tafsiran = '';
     let percobaan = 0;
     const umpan = h('div', { 'aria-live': 'polite' });
     const tanya = h('p', { html: t.tanya });
@@ -53,7 +66,7 @@ export function tampilMasalah(root, [id]) {
           btn.classList.add('benar');
           opsi.forEach((b) => { b.disabled = true; });
           efek('benar');
-          catatLiterasi({ id: m.id, tahap: info.nama, benar: percobaan === 1, percobaan });
+          catatLiterasi({ id: m.id, tahap: info.nama, benar: percobaan === 1, percobaan, ...(menafsirkan ? { tafsiran } : {}) });
           umpan.replaceChildren(kotakUmpan(true, t.penjelasan));
           teman.bicara(indeks < m.tahap.length - 1 ? `Tahap ${info.nama} beres! Lanjut ke tahap berikutnya, yuk! ✨` : 'Yeay, semua tahap selesai! 🎉', 'senang');
           kartu.classList.add('tuntas');
@@ -74,11 +87,54 @@ export function tampilMasalah(root, [id]) {
       },
     }, teks));
 
-    const kartu = h('section', { class: 'kartu kartu-tahap muncul' },
+    const daftarOpsi = h('div', { class: 'daftar-opsi', hidden: menafsirkan });
+
+    // ---- Menafsirkan: tulis dulu tafsiranmu sendiri, baru pilihan & penjelasan muncul
+    let bagianTafsir = null;
+    if (menafsirkan) {
+      const kotak = h('textarea', {
+        class: 'input-tafsir', rows: '3', maxlength: '300',
+        'aria-label': 'Tafsiranmu dalam satu kalimat', placeholder: 'Contoh: Artinya, ... karena ...',
+      });
+      const simpanBtn = h('button', { class: 'btn btn-sekunder lebar', type: 'button' }, '✍️ Simpan tafsiranku');
+      const umpanTafsir = h('div', { 'aria-live': 'polite' });
+      if (ai) ai.hentikan();
+      ai = panelTanyaAI(() => {
+        const cerita = h('div', { html: m.stimulus }).textContent.replace(/\s+/g, ' ').slice(0, 450);
+        return `Misi literasi "${m.judul}". Cerita: ${cerita} Tahap: Menafsirkan. Pertanyaan: ${h('div', { html: t.tanya }).textContent} Tafsiran tertulis siswa: ${tafsiran || '(belum ditulis)'}.`;
+      });
+      simpanBtn.addEventListener('click', () => {
+        const isi = kotak.value.trim();
+        if (isi.length < MIN_TAFSIRAN) {
+          umpanTafsir.replaceChildren(kotakUmpan(false, 'Tulis satu kalimat lengkap, ya: apa arti jawabannya dalam cerita, dan mengapa?'));
+          kotak.focus();
+          return;
+        }
+        tafsiran = isi;
+        kotak.disabled = true;
+        simpanBtn.disabled = true;
+        efek('buka');
+        const p = h('p', {});
+        p.textContent = `Tafsiranmu: "${isi}"`; // teks siswa → textContent (aman)
+        umpanTafsir.replaceChildren(h('div', { class: 'kotak-jembatan' }, p,
+          h('p', { class: 'kecil muted' }, 'Sekarang bandingkan dengan pilihan di bawah. Mau pendapat Teman AI tentang tafsiranmu? Tekan 🤖 Tanya Teman AI.')));
+        daftarOpsi.hidden = false;
+        teman.bicara('Bagus, kamu sudah menulis alasanmu sendiri! Sekarang pilih jawaban yang paling tepat ✍️', 'senang');
+      });
+      bagianTafsir = h('div', { class: 'tafsir-tulis' },
+        h('p', { class: 'kecil tebal' }, '✍️ Tulis dulu tafsiranmu sendiri dalam satu kalimat:'),
+        kotak, simpanBtn, umpanTafsir,
+        h('div', { class: 'baris-tombol' }, ai.tombol), ai.panel);
+    }
+
+    const kartu = h('section', { class: 'kartu kartu-tahap muncul' }, ...[
       h('div', { class: 'tahap-label' }, h('span', { class: 'tahap-no' }, String(indeks + 1)), ` ${info.ikon} ${info.nama}`, h('span', { class: 'kecil muted' }, ` · ${info.ket}`)),
+      h('div', { class: 'baris-label', 'data-tanpa-narasi': true }, h('span', { class: 'kecil muted' }, '🧠 Fungsi berpikir:'), (FUNGSI_LITERASI[info.nama] || []).map(labelFungsi)),
       tanya,
-      h('div', { class: 'daftar-opsi' }, opsi),
-      umpan);
+      bagianTafsir,
+      daftarOpsi,
+      umpan].filter(Boolean));
+    daftarOpsi.append(...opsi);
     daftarTahap.append(kartu);
     kartu.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -104,5 +160,5 @@ export function tampilMasalah(root, [id]) {
 
   tampilTahap();
   window.scrollTo({ top: 0 });
-  return () => hentikanNarasi();
+  return () => { hentikanNarasi(); if (ai) ai.hentikan(); };
 }

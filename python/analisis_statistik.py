@@ -290,12 +290,22 @@ def analisis(siswa: list[dict], bank: dict, mode_kuis: str, kktp: float) -> dict
     for d in siswa:
         for l in d.get("latihan", []):
             lat[l.get("jenis", "?")].append(l)
-    hasil["latihan"] = {
-        j: {"n": len(v), "akurasi": st.fmean([1 if x.get("benar") else 0 for x in v]) * 100,
+    def persen_bool(v: list[dict], kunci: str) -> tuple[float | None, int]:
+        """% True di antara entri yang punya nilai bool (versiData ≥ 2); entri lama/null dilewati."""
+        nilai = [x[kunci] for x in v if isinstance(x.get(kunci), bool)]
+        return (st.fmean([1 if b else 0 for b in nilai]) * 100 if nilai else None), len(nilai)
+
+    hasil["latihan"] = {}
+    for j, v in sorted(lat.items()):
+        definisi, n_def = persen_bool(v, "definisiMasalah")   # RMT C3: "Apa yang ditanyakan?"
+        bukti, n_bukti = persen_bool(v, "bukti")               # RMT C2: "Buktikan"
+        hasil["latihan"][j] = {
+            "n": len(v), "akurasi": st.fmean([1 if x.get("benar") else 0 for x in v]) * 100,
             "petunjuk_rata": st.fmean([x.get("petunjuk", 0) for x in v]),
-            "durasi_rata": st.fmean([x.get("durasiDetik", 0) for x in v])}
-        for j, v in sorted(lat.items())
-    }
+            "durasi_rata": st.fmean([x.get("durasiDetik", 0) for x in v]),
+            "definisi_tepat": definisi, "n_definisi": n_def,
+            "bukti_tepat": bukti, "n_bukti": n_bukti,
+        }
 
     # ---- Literasi ----
     lit: dict[str, list[dict]] = defaultdict(list)
@@ -307,7 +317,84 @@ def analisis(siswa: list[dict], bank: dict, mode_kuis: str, kktp: float) -> dict
         t: {"n": len(lit[t]), "benar_percobaan_1": st.fmean([1 if x.get("benar") else 0 for x in lit[t]]) * 100}
         for t in urutan if lit.get(t)
     }
+    hasil["rmt"] = analisis_rmt(siswa, bank, mode_kuis)
     return hasil
+
+
+# ---------------------------------------------------------------------------
+# Indikator RMT (versiData ≥ 3; data lama dilewati, bukan dianggap salah). docs/08 Tahap 7.
+# ---------------------------------------------------------------------------
+def nama_fungsi() -> dict[str, str]:
+    """Kode → nama ramah siswa, dibaca dari app/js/data/rmt.js (sumber tunggal, lewat gemini.py)."""
+    try:
+        import gemini  # pustaka standar saja; tidak memanggil internet
+        return dict(gemini.daftar_fungsi())
+    except Exception:
+        return {}
+
+
+def analisis_rmt(siswa: list[dict], bank: dict, mode_kuis: str) -> dict:
+    ids_pretes = bank.get("pretes", [])
+    nama = nama_fungsi()
+
+    # 1. Asesmen dinamis "sandwich" (hlm. 60): pretes vs butir yang sama di kuis akhir
+    pasangan = []
+    for d in siswa:
+        pre = (d.get("pretes") or [None])[0]
+        k = pilih_kuis(d, mode_kuis)
+        if not pre or not k or not ids_pretes:
+            continue
+        benar_pre = {j["id"]: bool(j.get("benar")) for j in pre.get("jawaban", [])}
+        benar_post = {j["id"]: bool(j.get("benar")) for j in k.get("jawaban", [])}
+        if not all(i in benar_pre and i in benar_post for i in ids_pretes):
+            continue
+        a = 100 * sum(benar_pre[i] for i in ids_pretes) / len(ids_pretes)
+        b = 100 * sum(benar_post[i] for i in ids_pretes) / len(ids_pretes)
+        g = (b - a) / (100 - a) if a < 100 else None  # gain ternormalisasi (Hake)
+        pasangan.append({"nama": nama_siswa(d), "pre": a, "post": b, "gain": g})
+    gain = [p["gain"] for p in pasangan if p["gain"] is not None]
+    sandwich = {
+        "n": len(pasangan), "butir": ids_pretes,
+        "pre": st.fmean([p["pre"] for p in pasangan]) if pasangan else None,
+        "post": st.fmean([p["post"] for p in pasangan]) if pasangan else None,
+        "gain": st.fmean(gain) if gain else None,
+        "naik": sum(1 for p in pasangan if p["post"] > p["pre"]), "per_siswa": pasangan,
+    }
+
+    # 2. Asesmen dinamis "cake" (hlm. 60): rata-rata lapisan bantuan per jenis latihan
+    lapisan: dict[str, list[int]] = defaultdict(list)
+    for d in siswa:
+        for l in d.get("latihan", []):
+            if isinstance(l.get("lapisanBantuan"), (int, float)):
+                lapisan[l.get("jenis", "?")].append(l["lapisanBantuan"])
+    lapisan_ringkas = {j: {"n": len(v), "rata": st.fmean(v), "tanpa_bantuan": 100 * sum(1 for x in v if x == 0) / len(v)}
+                       for j, v in sorted(lapisan.items())}
+
+    # 3. Pemanasan Berpikir (Fase I)
+    pem = [p for d in siswa for p in d.get("pemanasan", [])]
+    def persen(kunci):
+        v = [p[kunci] for p in pem if isinstance(p.get(kunci), bool)]
+        return 100 * sum(v) / len(v) if v else None
+    pemanasan = {"n": len(pem), "definisi": persen("definisi"), "benar": persen("benar"), "fungsi_tepat": persen("fungsiTepat")}
+
+    # 4. Jurnal: frekuensi fungsi berpikir (C13) & tafsiran tertulis literasi
+    frek: Counter = Counter()
+    jurnal_baris, tafsir_baris = [], []
+    for d in siswa:
+        for j in d.get("jurnal", []):
+            frek.update(j.get("fungsiKognitif", []))
+            jurnal_baris.append({"nama": nama_siswa(d), "kelas": d.get("profil", {}).get("kelas", ""), "waktu": j.get("waktu", ""),
+                                 "konteks": j.get("konteks", ""), "fungsi": ", ".join(nama.get(k, k) for k in j.get("fungsiKognitif", [])),
+                                 "refleksi": j.get("refleksi", "")})
+        for l in d.get("literasi", []):
+            if l.get("tafsiran"):
+                tafsir_baris.append({"nama": nama_siswa(d), "kelas": d.get("profil", {}).get("kelas", ""), "misi": l.get("id", ""),
+                                     "pilihan_benar": "ya" if l.get("benar") else "tidak", "tafsiran": l["tafsiran"]})
+    return {
+        "sandwich": sandwich, "lapisan": lapisan_ringkas, "pemanasan": pemanasan,
+        "fungsi": [(k, nama.get(k, k), n) for k, n in frek.most_common()],
+        "jurnal": jurnal_baris, "tafsiran": tafsir_baris,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -377,11 +464,17 @@ def tulis_laporan(h: dict, bank: dict, folder: Path) -> str:
 
     L.append("## 6. Latihan\n")
     if h["latihan"]:
-        L.append("| Jenis | Jumlah soal | Akurasi (%) | Rata-rata petunjuk | Rata-rata durasi (detik) |")
-        L.append("|-------|-------------|-------------|--------------------|--------------------------|")
+        L.append("| Jenis | Jumlah soal | Akurasi (%) | Rata-rata petunjuk | Rata-rata durasi (detik) "
+                 "| Definisi masalah tepat (%) | Bukti logis tepat (%) |")
+        L.append("|-------|-------------|-------------|--------------------|--------------------------"
+                 "|----------------------------|-----------------------|")
         for j, v in h["latihan"].items():
-            L.append(f"| {j} | {v['n']} | {f2(v['akurasi'], 1)} | {f2(v['petunjuk_rata'])} | {f2(v['durasi_rata'], 1)} |")
+            L.append(f"| {j} | {v['n']} | {f2(v['akurasi'], 1)} | {f2(v['petunjuk_rata'])} | {f2(v['durasi_rata'], 1)} "
+                     f"| {f2(v['definisi_tepat'], 1)} (n={v['n_definisi']}) | {f2(v['bukti_tepat'], 1)} (n={v['n_bukti']}) |")
         L.append("")
+        L.append("_Definisi masalah = langkah RMT \"Apa yang ditanyakan?\" (fungsi kognitif C3); bukti logis = "
+                 "langkah \"Buktikan\" (C2), hanya diminta bila jawaban angka benar. Data versiData 1 tidak "
+                 "memiliki kedua kolom ini (n dihitung dari data yang ada)._\n")
 
     L.append("## 7. Literasi Matematika (benar pada percobaan pertama)\n")
     if h["literasi"]:
@@ -390,6 +483,51 @@ def tulis_laporan(h: dict, bank: dict, folder: Path) -> str:
         for t, v in h["literasi"].items():
             L.append(f"| {t} | {v['n']} | {f2(v['benar_percobaan_1'], 1)} |")
         L.append("")
+
+    r = h.get("rmt") or {}
+    L.append("## 8. Indikator Rigorous Mathematical Thinking (RMT)\n")
+    L.append("_Rujukan: Kinard & Kozulin (lihat `docs/08-analisis-rmt.md`). Data versiData < 3 tidak memuat "
+             "sebagian indikator ini dan dilewati._\n")
+    s = r.get("sandwich") or {}
+    L.append("### 8.1 Asesmen dinamis \"sandwich\": Tes Awal → Kuis akhir (butir yang sama)\n")
+    if s.get("n"):
+        L.append(f"Butir: {', '.join(s['butir'])}. Pasangan data: **{s['n']} siswa**.\n")
+        L.append("| Rata-rata Tes Awal (%) | Rata-rata butir sama di Kuis (%) | Gain ternormalisasi ⟨g⟩ | Siswa yang naik |")
+        L.append("|---|---|---|---|")
+        L.append(f"| {f2(s['pre'], 1)} | {f2(s['post'], 1)} | {f2(s['gain'])} | {s['naik']} dari {s['n']} |\n")
+        L.append("_⟨g⟩ = (post − pre) / (100 − pre); kategori Hake: < 0,3 rendah, 0,3–0,7 sedang, > 0,7 tinggi._\n")
+    else:
+        L.append("_Belum ada siswa yang memiliki Tes Awal dan Kuis sekaligus._\n")
+    L.append("### 8.2 Asesmen dinamis \"cake\": lapisan bantuan per soal latihan\n")
+    if r.get("lapisan"):
+        L.append("| Jenis | n | Rata-rata lapisan bantuan | Tanpa bantuan (%) |")
+        L.append("|---|---|---|---|")
+        for j, v in r["lapisan"].items():
+            L.append(f"| {j} | {v['n']} | {f2(v['rata'])} | {f2(v['tanpa_bantuan'], 1)} |")
+        L.append("\n_Lapisan bantuan = petunjuk + contoh + pesan Teman AI sebelum jawaban diperiksa. "
+                 "Makin sedikit lapisan yang dibutuhkan → makin mandiri (potensi belajar, hlm. 60, 194–195)._\n")
+    else:
+        L.append("_Belum ada data lapisan bantuan._\n")
+    p = r.get("pemanasan") or {}
+    L.append("### 8.3 Pemanasan Berpikir (Fase I)\n")
+    if p.get("n"):
+        L.append("| n tugas | Definisi masalah tepat (%) | Tugas benar (%) | Menamai fungsi berpikir tepat (%) |")
+        L.append("|---|---|---|---|")
+        L.append(f"| {p['n']} | {f2(p['definisi'], 1)} | {f2(p['benar'], 1)} | {f2(p['fungsi_tepat'], 1)} |\n")
+    else:
+        L.append("_Belum ada data Pemanasan._\n")
+    L.append("### 8.4 Fungsi berpikir di Jurnal RMT\n")
+    if r.get("fungsi"):
+        L.append("| Kode | Fungsi berpikir | Jumlah |")
+        L.append("|---|---|---|")
+        for k, nm, n in r["fungsi"][:12]:
+            L.append(f"| {k} | {nm} | {n} |")
+        L.append("")
+    else:
+        L.append("_Belum ada catatan jurnal._\n")
+    L.append(f"### 8.5 Penjelasan tertulis\n\nTafsiran literasi: **{len(r.get('tafsiran', []))}**; entri jurnal: "
+             f"**{len(r.get('jurnal', []))}**. Nilai dengan rubrik di `docs/10-rubrik-rmt.md` memakai berkas "
+             "`tafsiran_rubrik.csv` dan `jurnal_rubrik.csv` (kolom K1–K4 dikosongkan untuk diisi guru).\n")
 
     L.append("---\n_Dibuat otomatis oleh `python/analisis_statistik.py`._")
     teks = "\n".join(L)
@@ -411,6 +549,23 @@ def tulis_csv(h: dict, folder: Path) -> None:
             w.writeheader()
             for b in h["butir"]:
                 w.writerow({k: (f2(v, 3) if isinstance(v, float) else v) for k, v in b.items()})
+    # RMT: berkas siap dinilai guru dengan rubrik analitik (docs/10-rubrik-rmt.md); K1–K4 diisi 1–4
+    r = h.get("rmt") or {}
+    rubrik = ["K1_bahasa_matematika", "K2_bukti_logis", "K3_kesadaran_fungsi", "K4_keterhubungan"]
+    for nama_berkas, baris in (("tafsiran_rubrik.csv", r.get("tafsiran", [])), ("jurnal_rubrik.csv", r.get("jurnal", []))):
+        if not baris:
+            continue
+        with open(folder / nama_berkas, "w", newline="", encoding="utf-8-sig") as f:
+            w = csv.DictWriter(f, fieldnames=list(baris[0].keys()) + rubrik, delimiter=";")
+            w.writeheader()
+            for b in baris:
+                w.writerow({**b, **{k: "" for k in rubrik}})
+    if (r.get("sandwich") or {}).get("per_siswa"):
+        with open(folder / "pretes_postes.csv", "w", newline="", encoding="utf-8-sig") as f:
+            w = csv.DictWriter(f, fieldnames=["nama", "pre", "post", "gain"], delimiter=";")
+            w.writeheader()
+            for b in r["sandwich"]["per_siswa"]:
+                w.writerow({k: (f2(v) if isinstance(v, float) else ("" if v is None else v)) for k, v in b.items()})
 
 
 def buat_grafik(h: dict, folder: Path) -> bool:

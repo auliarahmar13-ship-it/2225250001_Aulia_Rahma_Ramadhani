@@ -29,6 +29,18 @@
 | UF24 | Selesaikan misi literasi | Skala beban muncul; misi bertanda ✓ di poster |
 | UF21 | Menara Angka: ketuk penyusup | Balok bergoyang, pesan "penyusup"; 8 ronde → bintang & rekor tersimpan |
 
+| UF25 | Tes Awal: kerjakan 5 soal | Tanpa umpan balik per soal; hasil tersimpan; tidak bisa diulang; Beranda lanjut ke Pemanasan |
+| UF26 | Pemanasan: 6 tugas (definisikan → kerjakan → namai fungsi) | Jembatan tampil; catatan & jurnal tersimpan; selesai → Materi u1 |
+| UF27 | Materi u2 garis bilangan / u3 tabel interaktif | Lanjut terkunci sampai alat dipakai; tabel menandai sel salah; rumus dipilih sendiri |
+| UF28 | Latihan: "Apa yang ditanyakan?" → hitung → "Buktikan" | Langkah berurutan; bukti hanya bila angka benar; fungsi berpikir tampil |
+| UF29 | Literasi tahap Menafsirkan | Pilihan tersembunyi sampai tafsiran ≥ 1 kalimat ditulis |
+| UF30 | Games: layar akhir | Pertanyaan refleksi strategi; tersimpan di Jurnal RMT |
+| UF31 | Saya → Jurnal RMT: tulis refleksi | Rekap fungsi diperbarui; teks tampil apa adanya |
+| UF32 | Teman AI (server menyala) | Bertanya balik, minta bukti, tidak memberi jawaban akhir; pesan kuota ramah |
+| UF33 | Ekspor data → `analisis_statistik.py` | `versiData: 3`; laporan §8 Indikator RMT + CSV rubrik |
+
+Uji otomatis: `python -m unittest discover python/tests` (bank soal, statistik, RMT, Gemini tiruan, endpoint API).
+
 ## 2. Uji Perangkat
 
 | Perangkat | Browser | Status |
@@ -43,6 +55,8 @@
 **Ahli materi:** kesesuaian dengan CP/TP, kebenaran konsep, kejelasan contoh,
 kualitas soal literasi, kesesuaian bahasa.
 **Ahli media:** tampilan, navigasi, keterbacaan, suara, kemudahan instalasi, penerapan prinsip CLT.
+**Ahli model RMT:** kesesuaian 3 fase, alat, bukti logis, kriteria MLE, asesmen dinamis.
+Butir lengkap: [12-lembar-validasi-ahli.md](12-lembar-validasi-ahli.md).
 
 Kriteria kelayakan: rata-rata skor 3,26–4,00 = Sangat layak; 2,51–3,25 = Layak;
 1,76–2,50 = Kurang layak; 1,00–1,75 = Tidak layak.

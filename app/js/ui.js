@@ -162,6 +162,32 @@ export function visualBarisan(suku, { label = true, beda = null } = {}) {
   return s;
 }
 
+// ------------------------------------------------------------------ garis bilangan (SVG) — alat RMT (hlm. 11, 58)
+// titik: suku-suku yang sudah "dilompati"; setiap lompatan diberi busur dan label beda.
+export function garisBilangan(min, max, titik, beda) {
+  const W = 330, H = 120, kiri = 15, kanan = W - 15, y = 78;
+  const x = (v) => kiri + ((v - min) / (max - min)) * (kanan - kiri);
+  const id = `gb${++idSvg}`;
+  let s = `<svg class="vis" viewBox="0 0 ${W} ${H}" role="img" aria-label="Garis bilangan ${min} sampai ${max}, titik ${titik.map(fmt).join(', ')}">`;
+  s += `<defs><marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="vis-panah"/></marker></defs>`;
+  s += `<line x1="${kiri}" y1="${y}" x2="${kanan}" y2="${y}" class="vis-busur" marker-end="url(#${id})"/>`;
+  for (let v = min; v <= max; v++) {
+    const besar = v % 5 === 0;
+    s += `<line x1="${x(v)}" y1="${y - (besar ? 7 : 4)}" x2="${x(v)}" y2="${y + (besar ? 7 : 4)}" class="vis-busur"/>`;
+    const dekatTitik = !titik.includes(v) && titik.some((t) => Math.abs(t - v) === 1); // hindari label berdempetan
+    if ((besar && !dekatTitik) || titik.includes(v)) s += `<text x="${x(v)}" y="${y + 24}" text-anchor="middle" class="vis-label" font-size="12">${fmt(v)}</text>`;
+  }
+  titik.forEach((v, i) => {
+    if (i > 0) {
+      const x1 = x(titik[i - 1]), x2 = x(v);
+      s += `<path d="M${x1} ${y - 6} Q${(x1 + x2) / 2} ${y - 52} ${x2} ${y - 6}" class="vis-busur" marker-end="url(#${id})"/>`;
+      s += `<text x="${(x1 + x2) / 2}" y="${y - 34}" text-anchor="middle" class="vis-beda">${beda >= 0 ? '+' : '−'}${fmt(Math.abs(beda))}</text>`;
+    }
+    s += `<circle cx="${x(v)}" cy="${y}" r="7" class="vis-kotak ${i === 0 ? 'vis-a' : ''}"/>`;
+  });
+  return `${s}</svg>`;
+}
+
 export function kotakUmpan(benar, isiHtml) {
   return h('div', { class: `umpan ${benar ? 'umpan-benar' : 'umpan-salah'}`, role: 'status' },
     h('strong', {}, benar ? '✅ Benar!' : '🤔 Belum tepat'),

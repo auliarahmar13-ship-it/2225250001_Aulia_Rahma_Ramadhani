@@ -5,7 +5,7 @@ import { bannerDunia } from '../dunia.js';
 import { temanBelajar } from '../teman.js';
 
 let cacheBank = null;
-async function muatBank() {
+export async function muatBank() { // dipakai juga oleh pretes.js
   if (cacheBank) return cacheBank;
   const r = await fetch('data/bank-soal.json');
   if (!r.ok) throw new Error(`HTTP ${r.status}`);

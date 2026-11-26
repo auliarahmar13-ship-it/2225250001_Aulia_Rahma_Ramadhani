@@ -4,6 +4,76 @@ import { mulaiMusik, hentikanMusik, perbaruiVolume, narasiTersedia, efek } from 
 import { UNIT } from '../data/materi.js';
 import { LITERASI } from '../data/literasi.js';
 import { bisaPasang, pasang, sudahTerpasang } from '../pasang.js';
+import { TINGKAT, fungsiTingkat, cariFungsi, KETERANGAN_TERJEMAHAN } from '../data/rmt.js';
+import { catatJurnal } from '../state.js';
+
+// Jurnal RMT (Tahap 7; hlm. 152, 167): rekap fungsi berpikir + refleksi mandiri. Teks siswa = textContent.
+const LABEL_KONTEKS = { pemanasan: '🧠 Pemanasan', games: '🎮 Games', mandiri: '✍️ Refleksimu' };
+function jurnalRMT(d) {
+  const sekarang = h('section', { class: 'kartu jurnal-rmt' });
+  const gambar = () => {
+    const hitung = {};
+    d.jurnal.forEach((j) => (j.fungsiKognitif || []).forEach((k) => { hitung[k] = (hitung[k] || 0) + 1; }));
+    const urut = Object.entries(hitung).sort((x, y) => y[1] - x[1]);
+    const definisi = d.latihan.filter((l) => l.definisiMasalah === true).length;
+    const bukti = d.latihan.filter((l) => l.bukti === true).length;
+
+    const pilihFungsi = h('select', { class: 'pilih-fungsi', 'aria-label': 'Fungsi berpikir yang kamu pakai' },
+      h('option', { value: '' }, 'Pilih fungsi berpikir…'),
+      TINGKAT.map((t) => h('optgroup', { label: t.nama }, fungsiTingkat(t.id).map((f) => h('option', { value: f.kode }, `${f.ikon} ${f.namaSiswa}`)))));
+    const tulisan = h('textarea', { class: 'input-tafsir', rows: '2', maxlength: '300', placeholder: 'Contoh: Aku membandingkan selisih tiap suku untuk menemukan beda.', 'aria-label': 'Refleksimu' });
+    const pesan = h('div', { 'aria-live': 'polite', class: 'kecil' });
+    const simpanBtn = h('button', { class: 'btn btn-sekunder lebar', type: 'button' }, 'Simpan ke jurnal');
+    simpanBtn.addEventListener('click', () => {
+      const isi = tulisan.value.trim();
+      if (!pilihFungsi.value || isi.length < 10) { pesan.textContent = 'Pilih fungsi berpikir dan tulis satu kalimat, ya.'; return; }
+      catatJurnal({ konteks: 'mandiri', fungsiKognitif: [pilihFungsi.value], refleksi: isi });
+      toast('Refleksi tersimpan di jurnal');
+      gambar();
+    });
+
+    const terbaru = d.jurnal.slice().reverse().slice(0, 5).map((j) => {
+      const teks = h('div', {});
+      teks.textContent = j.refleksi;
+      const nama = (j.fungsiKognitif || []).map(cariFungsi).filter(Boolean).map((f) => `${f.ikon} ${f.namaSiswa}`).join(', ');
+      return h('li', {},
+        h('div', { class: 'kecil muted' }, `${new Date(j.waktu).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} · ${LABEL_KONTEKS[String(j.konteks).split(':')[0]] || j.konteks}`),
+        teks, nama ? h('div', { class: 'kecil' }, `🧠 ${nama}`) : null);
+    });
+
+    sekarang.replaceChildren(...[ // filter: replaceChildren(null) menulis teks "null"
+      h('h2', {}, '📓 Jurnal RMT'),
+      h('p', { class: 'kecil muted' }, 'Catatan cara berpikirmu dari Pemanasan, Games, dan refleksimu sendiri.'),
+      h('div', { class: 'tebal kecil' }, 'Fungsi berpikir yang sudah kamu pakai:'),
+      urut.length
+        ? h('div', { class: 'baris-label' }, urut.slice(0, 8).map(([k, n]) => { const f = cariFungsi(k); return f ? h('span', { class: 'label-fungsi', title: `${f.kode} · ${f.nama}` }, `${f.ikon} ${f.namaSiswa} ×${n}`) : null; }))
+        : h('p', { class: 'kecil muted' }, 'Belum ada catatan. Coba Pemanasan Berpikir atau Games, ya!'),
+      h('p', { class: 'kecil' }, `❓ Memahami apa yang ditanyakan: ${definisi}× tepat · 🧾 Memberi bukti: ${bukti}× tepat (di Latihan)`),
+      terbaru.length ? h('details', { class: 'pembahasan' }, h('summary', {}, `Catatan terbaru (${terbaru.length})`), h('ul', { class: 'langkah' }, terbaru)) : null,
+      h('details', { class: 'pembahasan' }, h('summary', {}, '✍️ Tulis refleksi'),
+        h('p', { class: 'kecil muted' }, 'Fungsi berpikir apa yang kamu pakai hari ini, dan bagaimana?'), pilihFungsi, tulisan, simpanBtn, pesan),
+    ].filter(Boolean));
+  };
+  gambar();
+  return sekarang;
+}
+
+// Kamus Fungsi Berpikir (RMT, Tabel 4.1). Tertutup secara bawaan agar tidak menambah beban.
+function kamusFungsi() {
+  return h('section', { class: 'kartu kamus-fungsi' },
+    h('h2', {}, '📖 Kamus Fungsi Berpikir'),
+    h('p', { class: 'kecil muted' }, 'Saat belajar matematika, pikiranmu melakukan "tindakan berpikir". Kenali namanya agar kamu sadar cara berpikirmu sendiri.'),
+    TINGKAT.map((t) => h('details', { class: 'pembahasan' },
+      h('summary', {}, t.nama),
+      h('p', { class: 'kecil muted' }, `${t.ket} (${t.istilahAsli})`),
+      h('ul', { class: 'langkah' }, fungsiTingkat(t.id).map((f) => h('li', {},
+        h('div', { class: 'tebal' }, `${f.ikon} ${f.namaSiswa}`),
+        h('div', { class: 'kecil muted' }, `${f.kode} · ${f.nama} · `, h('i', { lang: 'en' }, f.istilahAsli)),
+        h('div', {}, f.definisi),
+        h('div', { class: 'kecil' }, `Contoh: ${f.contoh}`),
+        f.catatan ? h('div', { class: 'kecil muted' }, `Catatan istilah: ${f.catatan}`) : null))))),
+    h('p', { class: 'kecil muted' }, KETERANGAN_TERJEMAHAN));
+}
 
 export function tampil(root) {
   const d = ambil();
@@ -68,6 +138,9 @@ export function tampil(root) {
           h('span', {}, new Date(k.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })),
           h('strong', {}, `${k.skor}`))))) : null),
 
+    jurnalRMT(d),
+    kamusFungsi(),
+
     h('section', { class: 'kartu' },
       h('h2', {}, 'Pengaturan'),
       saklar('🎵 Musik latar', 'musik', (on) => (on ? mulaiMusik() : hentikanMusik())),
@@ -102,7 +175,7 @@ export function tampil(root) {
 
     h('section', { class: 'kartu' },
       h('h2', {}, 'Tentang'),
-      h('p', {}, h('strong', {}, 'DeretKu'), ' v1.0. Media belajar barisan & deret aritmatika untuk SMP, dirancang berdasarkan Teori Beban Kognitif dan kerangka literasi matematika PISA.'),
+      h('p', {}, h('strong', {}, 'DeretKu'), ' v2.0. Media belajar barisan & deret aritmatika untuk SMP, dirancang dengan model Rigorous Mathematical Thinking (RMT), Teori Beban Kognitif, dan kerangka literasi matematika PISA.'),
       !sudahTerpasang() && bisaPasang() ? h('button', { class: 'btn btn-sekunder lebar', onclick: pasang }, '📲 Pasang Aplikasi') : null,
       h('p', { class: 'kecil muted' }, sudahTerpasang() ? '✓ Aplikasi sudah terpasang.' : 'Android: menu ⋮ → "Instal aplikasi". iPhone: Bagikan → "Tambah ke Layar Utama".')),
   );

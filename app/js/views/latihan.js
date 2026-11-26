@@ -1,9 +1,19 @@
-import { h, visualBarisan, tombolNarasi, kotakUmpan, tanyaBeban, toast, fmt } from '../ui.js';
+import { h, visualBarisan, tombolNarasi, kotakUmpan, tanyaBeban, toast, fmt, acakUrutan } from '../ui.js';
 import { ambil, aturLevel, catatLatihan } from '../state.js';
 import { efek, hentikanNarasi } from '../audio.js';
-import { JENIS, NAMA_LEVEL, buatSoal, bacaJawaban } from '../generator.js';
+import { JENIS, NAMA_LEVEL, OPSI_DITANYA, buatSoal, bacaJawaban } from '../generator.js';
 import { bannerDunia } from '../dunia.js';
 import { temanBelajar } from '../teman.js';
+import { panelTanyaAI } from '../ai.js';
+import { FUNGSI_LANGKAH, FUNGSI_LATIHAN, cariFungsi } from '../data/rmt.js';
+
+// RMT (docs/08 Tahap 2): setiap soal = Langkah 1 "Apa yang ditanyakan?" (C3) → Langkah 2 hitung →
+// Langkah 3 "Buktikan" (C2, hanya bila jawaban angka benar). Umpan balik menyebut fungsi berpikir.
+function labelFungsi(kode) {
+  const f = cariFungsi(kode);
+  return f ? h('div', { class: 'label-fungsi', title: `${f.kode} · ${f.nama} (${f.istilahAsli})` },
+    `🧠 Fungsi berpikir: ${f.ikon} ${f.namaSiswa}`) : null;
+}
 
 const NAIK_SETELAH = 3; // benar berturut-turut tanpa petunjuk
 const TURUN_SETELAH = 2; // salah berturut-turut
@@ -38,6 +48,8 @@ export function tampilSesi(root, [jenis]) {
   let level = ambil().levelLatihan[jenis] || 1;
   let beruntun = 0, salahBeruntun = 0, dijawab = 0, benarSesi = 0;
   let soal, petunjuk, mulai, percobaan, tuntas;
+  let ai = null; // panel Teman AI untuk soal yang sedang tampil
+  let simpanTertunda = null; // menyimpan catatan soal yang menunggu langkah "Buktikan"
 
   const kepala = h('div', { class: 'sesi-kepala' });
   const area = h('div');
@@ -83,6 +95,32 @@ export function tampilSesi(root, [jenis]) {
     const tombolPetunjuk = h('button', { class: 'btn btn-sekunder', type: 'button' }, `💡 Petunjuk (${petunjuk}/${soal.petunjuk.length})`);
     const panelContoh = h('div', { class: 'panel-contoh', hidden: true });
     const tombolContoh = h('button', { class: 'btn btn-sekunder', type: 'button' }, '📘 Lihat contoh');
+    // Langkah RMT: hasilnya ikut dicatat (definisiMasalah, bukti) → ekspor versiData 2
+    let hasilDitanya = null; // true/false: pilihan pertama "Apa yang ditanyakan?" tepat
+    let hasilBukti = null;   // true/false/null (null = tidak diminta, mis. jawaban salah 2×)
+    let catatan = null;      // isi catatLatihan yang menunggu langkah Buktikan
+    let langkah = 'ditanya'; // 'ditanya' | 'hitung' | 'bukti' | 'selesai' (untuk konteks Teman AI)
+    let contohDibuka = false; // lapisan bantuan (asesmen dinamis "cake", hlm. 60)
+    const simpan = () => {
+      if (!catatan) return;
+      catatLatihan({ ...catatan, definisiMasalah: hasilDitanya, bukti: hasilBukti });
+      catatan = null;
+    };
+    simpanTertunda = simpan;
+
+    // Teman AI (mediator RMT): konteks = teks soal + status jawaban siswa. Kunci jawaban TIDAK dikirim.
+    let terakhir = null; // { nilai, benar } jawaban terakhir yang sudah diperiksa aplikasi
+    if (ai) ai.hentikan();
+    ai = panelTanyaAI(() => {
+      const status = !terakhir ? 'Siswa belum memeriksa jawaban.'
+        : terakhir.benar ? `Jawaban siswa ${fmt(terakhir.nilai)} sudah diperiksa aplikasi: BENAR.`
+          : `Jawaban siswa ${fmt(terakhir.nilai)} sudah diperiksa aplikasi: belum tepat${tuntas ? '; pembahasan sudah ditampilkan' : ''}.`;
+      const NAMA_LANGKAH = {
+        ditanya: 'menentukan apa yang ditanyakan soal', hitung: 'menghitung jawaban',
+        bukti: 'memilih alasan (bukti) mengapa jawabannya benar', selesai: 'soal sudah selesai',
+      };
+      return `Latihan "${info.judul}", level ${NAMA_LEVEL[level]}. Soal: ${h('div', { html: soal.teks }).textContent} ${status} Langkah siswa sekarang: ${NAMA_LANGKAH[langkah]}. Petunjuk yang sudah dibuka: ${petunjuk} dari ${soal.petunjuk.length}.`;
+    });
 
     const form = h('form', { class: 'baris-input', onsubmit: (e) => { e.preventDefault(); periksa(); } },
       h('button', {
@@ -107,6 +145,7 @@ export function tampilSesi(root, [jenis]) {
     tombolContoh.addEventListener('click', () => {
       if (!panelContoh.hidden) { panelContoh.hidden = true; tombolContoh.textContent = '📘 Lihat contoh'; return; }
       const c = buatSoal(jenis, 1);
+      if (!tuntas) contohDibuka = true;
       panelContoh.replaceChildren(
         h('div', { class: 'tebal' }, 'Contoh terselesaikan (angka berbeda)'),
         h('p', { html: c.teks }),
@@ -122,12 +161,14 @@ export function tampilSesi(root, [jenis]) {
       const nilai = bacaJawaban(input.value);
       if (nilai === null) { toast('Tulis jawabanmu berupa angka, ya.'); input.focus(); return; }
       const benar = nilai === soal.jawaban;
+      terakhir = { nilai, benar };
       percobaan++;
       if (benar) {
         efek('benar');
         teman.bicara(percobaan === 1 ? SAPA_BENAR[dijawab % SAPA_BENAR.length] : 'Bagus! Kamu berhasil memperbaikinya! 💪', 'senang');
-        akhiri(percobaan === 1);
-        umpan.replaceChildren(kotakUmpan(true, percobaan === 1 ? 'Mantap!' : 'Bagus, kamu berhasil memperbaikinya!'), pembahasan());
+        umpan.replaceChildren(kotakUmpan(true, percobaan === 1 ? 'Mantap!' : 'Bagus, kamu berhasil memperbaikinya!'),
+          labelFungsi(FUNGSI_LATIHAN[jenis]), pembahasan());
+        akhiri(percobaan === 1, true);
       } else if (percobaan < 2) {
         efek('salah');
         teman.bicara('Tidak apa-apa, salah itu bagian dari belajar! Coba buka 💡 Petunjuk, ya 😊', 'semangat');
@@ -136,8 +177,8 @@ export function tampilSesi(root, [jenis]) {
       } else {
         efek('salah');
         teman.bicara('Ayo kita pelajari pembahasannya bersama. Soal berikutnya pasti bisa! 🌟', 'semangat');
-        akhiri(false);
         umpan.replaceChildren(kotakUmpan(false, `Jawaban yang benar adalah <strong>${fmt(soal.jawaban)}</strong>. Pelajari langkahnya:`), pembahasan(true));
+        akhiri(false, false);
       }
     }
 
@@ -147,17 +188,21 @@ export function tampilSesi(root, [jenis]) {
         h('ol', { class: 'langkah' }, soal.pembahasan.map((p) => h('li', { html: p }))));
     }
 
-    function akhiri(benarPertama) {
+    // perluBukti: jawaban angka benar → lanjut ke Langkah 3 "Buktikan" sebelum soal berikutnya
+    function akhiri(benarPertama, perluBukti) {
       tuntas = true;
       input.disabled = true;
       tombolPeriksa.disabled = true;
       tombolPetunjuk.disabled = true;
       dijawab++;
       if (benarPertama) benarSesi++;
-      catatLatihan({
+      // Lapisan bantuan dihitung SAAT jawaban diperiksa (bantuan sesudahnya bukan bantuan menjawab)
+      const aiPesan = ai ? ai.jumlahPesan() : 0;
+      catatan = {
         jenis, level, benar: benarPertama, petunjuk,
         durasiDetik: Math.round((Date.now() - mulai) / 1000),
-      });
+        contoh: contohDibuka, aiPesan, lapisanBantuan: petunjuk + (contohDibuka ? 1 : 0) + aiPesan,
+      };
       // Adaptif: naik/turun level
       if (benarPertama && petunjuk === 0) {
         beruntun++; salahBeruntun = 0;
@@ -177,20 +222,98 @@ export function tampilSesi(root, [jenis]) {
         beruntun = 0; salahBeruntun = 0;
       }
       renderKepala();
+      if (perluBukti) { tampilBukti(); return; }
+      langkah = 'selesai';
+      simpan();
+      tampilLanjut();
+    }
+
+    function tampilLanjut() {
       const lanjut = h('button', { class: 'btn btn-utama lebar', onclick: soalBaru }, 'Soal berikutnya →');
-      umpan.after(lanjut);
+      wadahLanjut.replaceChildren(lanjut);
       lanjut.focus({ preventScroll: true });
     }
 
-    isi.append(
+    // ---- Langkah 1: Apa yang ditanyakan? (C3 mendefinisikan masalah; hlm. 87, 92, 137)
+    const umpanDitanya = h('div', { 'aria-live': 'polite' });
+    const opsiDitanya = acakUrutan(OPSI_DITANYA).map((o) => h('button', {
+      class: 'opsi', type: 'button', 'data-ditanya': o.id,
+      onclick: (e) => pilihDitanya(o.id, e.currentTarget),
+    }, h('span', { html: o.html }))); // satu span: .opsi = flex, agar teks tidak terpecah
+    const langkahDitanya = h('section', { class: 'langkah-rmt', 'data-tanpa-narasi': true },
+      h('div', { class: 'langkah-judul' }, h('span', { class: 'tahap-no' }, '1'), ' ❓ Apa yang ditanyakan?'),
+      h('p', { class: 'kecil muted' }, 'Sebelum menghitung, pastikan dulu apa yang dicari soal ini.'),
+      h('div', { class: 'daftar-opsi' }, opsiDitanya),
+      umpanDitanya);
+    const langkahHitung = h('section', { class: 'langkah-rmt', hidden: true },
+      h('div', { class: 'langkah-judul' }, h('span', { class: 'tahap-no' }, '2'), ' 🧮 Hitung jawabanmu'),
+      form);
+
+    function pilihDitanya(id, tombol) {
+      if (hasilDitanya !== null) return;
+      hasilDitanya = id === soal.ditanya;
+      opsiDitanya.forEach((b) => {
+        b.disabled = true;
+        if (b.dataset.ditanya === soal.ditanya) b.classList.add('benar');
+      });
+      if (!hasilDitanya) tombol.classList.add('salah');
+      efek(hasilDitanya ? 'benar' : 'salah');
+      umpanDitanya.replaceChildren(
+        kotakUmpan(hasilDitanya, hasilDitanya ? soal.alasanDitanya : `Perhatikan kata kunci di soal. ${soal.alasanDitanya}`),
+        labelFungsi(FUNGSI_LANGKAH.ditanya));
+      langkah = 'hitung';
+      langkahHitung.hidden = false;
+      input.focus({ preventScroll: true });
+    }
+
+    // ---- Langkah 3: Buktikan (C2 bukti logis matematis; hlm. 87, 166). Satu kali pilih.
+    const langkahBukti = h('section', { class: 'langkah-rmt', hidden: true, 'data-tanpa-narasi': true });
+    const wadahLanjut = h('div');
+
+    function tampilBukti() {
+      langkah = 'bukti';
+      const umpanBukti = h('div', { 'aria-live': 'polite' });
+      const pilihan = acakUrutan([{ teks: soal.bukti.benar, benar: true }, ...soal.bukti.pengecoh]);
+      const tombol = pilihan.map((p) => h('button', {
+        class: 'opsi', type: 'button',
+        onclick: (e) => {
+          if (hasilBukti !== null) return;
+          hasilBukti = !!p.benar;
+          tombol.forEach((b, i) => { b.disabled = true; if (pilihan[i].benar) b.classList.add('benar'); });
+          if (!hasilBukti) e.currentTarget.classList.add('salah');
+          efek(hasilBukti ? 'benar' : 'salah');
+          umpanBukti.replaceChildren(
+            kotakUmpan(hasilBukti, hasilBukti
+              ? 'Buktimu tepat! Kamu menunjukkan aturan dan perhitungannya, bukan sekadar menebak.'
+              : `Jawaban angkamu sudah benar, tetapi alasan ini belum tepat. ${p.kenapa} Alasan yang tepat ditandai ✓.`),
+            labelFungsi(FUNGSI_LANGKAH.bukti));
+          langkah = 'selesai';
+          simpan();
+          tampilLanjut();
+        },
+      }, h('span', { html: p.teks })));
+      langkahBukti.replaceChildren(
+        h('div', { class: 'langkah-judul' }, h('span', { class: 'tahap-no' }, '3'), ' 🧾 Buktikan: mengapa jawabanmu benar?'),
+        h('p', { class: 'kecil muted' }, 'Pilih alasan matematis yang paling tepat.'),
+        h('div', { class: 'daftar-opsi' }, tombol),
+        umpanBukti);
+      langkahBukti.hidden = false;
+      tombol[0].focus({ preventScroll: true });
+    }
+
+    isi.append(...[ // filter: Element.append(null) menulis teks "null" (kerangka hanya ada di level 1)
       h('div', { class: 'wadah-vis', html: visualBarisan(soal.suku) }),
       h('p', { class: 'teks-soal', html: soal.teks }),
       level === 1 ? h('div', { class: 'kerangka', 'data-tanpa-narasi': true }, h('span', { class: 'kecil muted' }, 'Kerangka rumus: '), h('span', { html: soal.kerangka })) : null,
       elPetunjuk,
-      form,
+      langkahDitanya,
+      langkahHitung,
       umpan,
-      h('div', { class: 'baris-tombol' }, tombolPetunjuk, tombolContoh),
-      panelContoh);
+      langkahBukti,
+      wadahLanjut,
+      h('div', { class: 'baris-tombol' }, tombolPetunjuk, tombolContoh, ai.tombol),
+      panelContoh,
+      ai.panel].filter(Boolean));
 
     area.replaceChildren(h('article', { class: 'kartu' },
       h('header', { class: 'kartu-kepala' }, h('h2', {}, 'Soal'), tombolNarasi(() => isi.querySelector('.teks-soal'))),
@@ -199,10 +322,11 @@ export function tampilSesi(root, [jenis]) {
 
   async function selesai() {
     hentikanNarasi();
+    if (simpanTertunda) simpanTertunda(); // soal yang belum sempat dibuktikan tetap tercatat (bukti: null)
     if (dijawab >= 3) await tanyaBeban(`latihan:${jenis}`, `Latihan ${info.judul}`);
     location.hash = '#/latihan';
   }
 
   soalBaru();
-  return () => hentikanNarasi();
+  return () => { hentikanNarasi(); if (simpanTertunda) simpanTertunda(); if (ai) ai.hentikan(); };
 }

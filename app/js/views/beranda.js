@@ -10,6 +10,7 @@ import { TEMAN, gambarTeman, peranTeman } from '../teman.js';
 import { adeganHero, ari, POSTER_UNIT, posterEmoji, posterGame, posterLiterasi } from '../ilustrasi.js';
 import { barisKartu, poster, kartuLebar } from '../dunia.js';
 import { bisaPasang, pasang, sudahTerpasang, iOS } from '../pasang.js';
+import { TUGAS } from '../data/pemanasan.js';
 
 const WARNA_LATIHAN = [['#4c1d95', '#ec4899'], ['#0f766e', '#a3e635'], ['#1e3a8a', '#38bdf8'], ['#7c2d12', '#f59e0b'], ['#701a75', '#c084fc']];
 const GAMES = [
@@ -21,14 +22,19 @@ const SAPAAN_ARI = ['Hai! Aku Ari ✨', 'Ayo bertualang!', 'Kamu hebat! 💪', '
 
 export function langkahBelajar() {
   const d = ambil();
-  const langkah = UNIT.map((u, i) => ({
-    no: i + 1, judul: u.judul, ikon: u.ikon, ket: u.ket, href: `#/materi/${u.id}`, selesai: !!d.materiSelesai[u.id],
-  }));
-  langkah.push({ no: 5, judul: 'Latihan', ikon: '✏️', ket: 'Minimal 10 soal', href: '#/latihan', selesai: d.latihan.length >= 10 });
+  // RMT: Fase I Pemanasan Berpikir → Fase II Materi → Fase III Latihan/Literasi → Kuis (docs/08 §9.1)
+  const pemanasanSelesai = TUGAS.filter((t) => d.pemanasanSelesai[t.id]).length;
+  // Tes Awal dulu (pretes "sandwich", hlm. 60) → Pemanasan → Materi → ... → Kuis (postes)
+  const langkah = [
+    { judul: 'Tes Awal', ikon: '📝', ket: '5 soal, tidak dinilai', href: '#/pretes', selesai: (d.pretes || []).length > 0 },
+    { judul: 'Pemanasan Berpikir', ikon: '🧠', ket: `${pemanasanSelesai}/${TUGAS.length} tugas pola`, href: '#/pemanasan', selesai: pemanasanSelesai === TUGAS.length },
+  ];
+  UNIT.forEach((u) => langkah.push({ judul: u.judul, ikon: u.ikon, ket: u.ket, href: `#/materi/${u.id}`, selesai: !!d.materiSelesai[u.id] }));
+  langkah.push({ judul: 'Latihan', ikon: '✏️', ket: 'Minimal 10 soal', href: '#/latihan', selesai: d.latihan.length >= 10 });
   const litSelesai = LITERASI.filter((l) => d.literasiSelesai[l.id]).length;
-  langkah.push({ no: 6, judul: 'Literasi Matematika', ikon: '📖', ket: `${litSelesai}/${LITERASI.length} masalah`, href: '#/literasi', selesai: litSelesai >= 3 });
-  langkah.push({ no: 7, judul: 'Kuis', ikon: '🏆', ket: '15 soal', href: '#/kuis', selesai: d.kuis.length > 0 });
-  return langkah;
+  langkah.push({ judul: 'Literasi Matematika', ikon: '📖', ket: `${litSelesai}/${LITERASI.length} masalah`, href: '#/literasi', selesai: litSelesai >= 3 });
+  langkah.push({ judul: 'Kuis', ikon: '🏆', ket: '15 soal', href: '#/kuis', selesai: d.kuis.length > 0 });
+  return langkah.map((l, i) => ({ no: i + 1, ...l }));
 }
 
 function heroBanner(d, langkah, berikut) {
@@ -55,7 +61,7 @@ function heroBanner(d, langkah, berikut) {
       h('h1', { class: 'hero-judul' }, 'Negeri ', h('span', {}, 'Aritmatika')),
       h('div', { class: 'hero-meta' },
         h('span', { class: 'meta-cocok' }, `${Math.round((jumlahSelesai / langkah.length) * 100)}% selesai`),
-        h('span', {}, '7 langkah'), h('span', { class: 'meta-kotak' }, 'SMP'), h('span', {}, 'Barisan & Deret')),
+        h('span', {}, `${langkah.length} langkah`), h('span', { class: 'meta-kotak' }, 'SMP'), h('span', {}, 'Barisan & Deret')),
       h('p', { class: 'hero-desk' }, berikut
         ? `Langkah ${berikut.no}: ${berikut.judul}. Bantu Ari menyusun tangga angka ajaib menuju istana!`
         : 'Semua langkah selesai! Kamu sudah jadi Juara Negeri Aritmatika 👑'),
@@ -74,15 +80,22 @@ export function tampil(root) {
   const langkah = langkahBelajar();
   const berikut = langkah.find((l) => !l.selesai);
 
+  const pemanasanSelesai = TUGAS.every((t) => d.pemanasanSelesai[t.id]);
+  const posterPemanasan = poster({
+    href: '#/pemanasan', ilustrasi: posterEmoji({ atas: '#1e1b4b', bawah: '#c084fc', emoji: '🧠', chip: ['🍎🍌', '🔴🔵', '🟪🟪'], benih: 55 }),
+    judul: 'Pemanasan Berpikir', label: 'Mulai dari sini', sub: pemanasanSelesai ? 'Ulangi kapan saja' : '6 tugas pola',
+    selesai: pemanasanSelesai, baru: !pemanasanSelesai,
+  });
   const posterUnit = UNIT.map((u, i) => {
     const selesai = !!d.materiSelesai[u.id];
     const pos = d.posisiKartu[u.id] || 0;
     return poster({
       href: `#/materi/${u.id}`, ilustrasi: POSTER_UNIT[u.id](), judul: u.judul, label: `Episode ${i + 1}`,
       sub: selesai ? 'Tonton ulang' : pos ? `Lanjut kartu ${pos + 1}` : `±${u.menit} menit`,
-      progres: selesai ? 1 : pos ? pos / u.kartu.length : null, selesai, baru: !selesai && !pos && i === 0,
+      progres: selesai ? 1 : pos ? pos / u.kartu.length : null, selesai, baru: pemanasanSelesai && !selesai && !pos && i === 0,
     });
   });
+  posterUnit.unshift(posterPemanasan);
 
   const kartuGames = GAMES.map((g, i) => kartuLebar({
     href: `#/games/${g.id}`, ilustrasi: posterGame(g.id), judul: g.judul, sub: g.sub, peringkat: i + 1, rekor: d.permainan[g.id]?.rekor,

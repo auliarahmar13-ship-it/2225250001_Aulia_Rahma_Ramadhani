@@ -41,11 +41,31 @@ def satu_siswa(i: int, bank: dict, rng: random.Random, mulai: datetime) -> dict:
     iso = lambda: t.isoformat(timespec="seconds")  # noqa: E731
 
     data = {
-        "aplikasi": "DeretKu", "versiData": 1, "simulasi": True,
+        "aplikasi": "DeretKu", "versiData": 3, "simulasi": True,
         "idPerangkat": f"sim{i:03d}", "diekspor": iso(),
         "profil": {"nama": f"Siswa Simulasi {i:02d}", "kelas": rng.choice(["VIII-A", "VIII-B"])},
-        "materiSelesai": [], "latihan": [], "kuis": [], "literasi": [], "bebanKognitif": [],
+        "materiSelesai": [], "pretes": [], "pemanasan": [], "latihan": [], "kuis": [], "literasi": [],
+        "jurnal": [], "bebanKognitif": [],
     }
+    # RMT (versiData 3): Tes Awal pada butir bank["pretes"] (kemampuan awal lebih rendah), lalu Pemanasan
+    jp = []
+    for sid in bank.get("pretes", []):
+        s = next(x for x in bank["soal"] if x["id"] == sid)
+        benar = rng.random() < logistik(1.7 * (theta - 0.7 - KESULITAN[s["level"]]))
+        salah = [o for o in s["opsi"] if not o["benar"]]
+        jp.append({"id": sid, "benar": benar, "miskonsepsi": None if benar else rng.choice(salah)["miskonsepsi"],
+                   "durasiDetik": rng.randint(15, 90)})
+    if jp:
+        nb = sum(j["benar"] for j in jp)
+        data["pretes"].append({"waktu": iso(), "skor": round(nb / len(jp) * 100), "benar": nb, "total": len(jp),
+                               "durasiDetik": sum(j["durasiDetik"] for j in jp), "jawaban": jp})
+    for pid, kode in zip(["P1", "P2", "P3", "P4", "P5", "P6"], ["A2", "A3", "B1", "B5", "A5", "C5"]):
+        tepat = rng.random() < logistik(1.2 * theta + 0.8)
+        data["pemanasan"].append({"waktu": iso(), "id": pid, "definisi": rng.random() < logistik(theta + 1.5),
+                                  "benar": rng.random() < logistik(theta + 1.2), "fungsiTepat": tepat})
+        data["jurnal"].append({"waktu": iso(), "konteks": f"pemanasan:{pid}", "fungsiKognitif": [kode if tepat else "A1"],
+                               "refleksi": "Catatan simulasi."})
+
     for u, dasar in zip(["u1", "u2", "u3", "u4"], [3, 4, 5.5, 6]):
         if rng.random() < 0.9:
             data["materiSelesai"].append(u)
@@ -55,16 +75,26 @@ def satu_siswa(i: int, bank: dict, rng: random.Random, mulai: datetime) -> dict:
         jenis = rng.choice(JENIS_LATIHAN)
         level = rng.choice([1, 1, 2, 2, 3])
         p = logistik(1.5 * (theta - (level - 2) * 0.8) + 0.5)
-        data["latihan"].append({"waktu": iso(), "jenis": jenis, "level": level, "benar": rng.random() < p,
+        benar = rng.random() < p
+        data["latihan"].append({"waktu": iso(), "jenis": jenis, "level": level, "benar": benar,
                                 "petunjuk": rng.choice([0, 0, 0, 1, 2, 3]) if theta < 0.5 else rng.choice([0, 0, 1]),
-                                "durasiDetik": rng.randint(15, 120)})
+                                "durasiDetik": rng.randint(15, 120),
+                                # RMT (versiData 2): definisi masalah & bukti logis (bukti hanya bila benar)
+                                "definisiMasalah": rng.random() < logistik(1.2 * theta + 1.2),
+                                "bukti": (rng.random() < logistik(1.3 * theta + 0.3)) if benar else None,
+                                # versiData 3: lapisan bantuan (asesmen dinamis "cake")
+                                "contoh": False, "aiPesan": 0,
+                                "lapisanBantuan": rng.choice([0, 0, 0, 1, 2, 3]) if theta < 0.5 else rng.choice([0, 0, 1])})
     data["bebanKognitif"].append({"waktu": iso(), "konteks": "latihan:campuran", "nilai": beban(theta, 5, rng)})
 
     for lid in ["L1", "L2", "L3"]:
         for k, tahap in enumerate(TAHAP):
             p = logistik(1.5 * (theta - (k - 1.5) * 0.4) + 0.6)
-            data["literasi"].append({"waktu": iso(), "id": lid, "tahap": tahap, "benar": rng.random() < p,
-                                     "percobaan": 1 if rng.random() < p else 2})
+            catat = {"waktu": iso(), "id": lid, "tahap": tahap, "benar": rng.random() < p,
+                     "percobaan": 1 if rng.random() < p else 2}
+            if tahap == "Menafsirkan":
+                catat["tafsiran"] = "Tafsiran simulasi: jawabannya cukup karena hasil hitungnya lebih besar."
+            data["literasi"].append(catat)
         data["bebanKognitif"].append({"waktu": iso(), "konteks": f"literasi:{lid}", "nilai": beban(theta, 5.5, rng)})
 
     jawaban = []

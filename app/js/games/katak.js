@@ -108,7 +108,7 @@ export function tampil(root) {
   layarMulai(root, {
     id: ID, judul: 'Lompat Katak', ikon: '🐸', warna: 'g-hijau',
     cara: [
-      'Katak selalu melompat dengan <strong>panjang yang sama</strong>, yaitu <span class="vb">beda (b)</span>.',
+      'Kolam ini adalah <strong>garis bilangan</strong>. Katak selalu melompat dengan <strong>panjang yang sama</strong>, yaitu <span class="vb">beda (b)</span>.',
       'Kadang kamu harus memilih <strong>panjang lompatan</strong> agar katak tepat mendarat di bunga 🌸.',
       'Kadang kamu harus menebak <strong>posisi akhir</strong> katak (suku ke-n).',
       'Ada 8 ronde. Salah jawab? Katak tercebur 💦!',

@@ -32,6 +32,7 @@ app/                    ROOT WEB: semua yang di-deploy ada di sini
   js/state.js           Penyimpanan (localStorage) + ekspor data
   js/audio.js           Musik latar generatif, efek suara, narasi (TTS)
   js/ui.js              Helper DOM, toast, modal skala beban kognitif, visual SVG
+  js/ai.js              Teman AI: panel tanya di Latihan → POST api/tanya (server). Tanpa API key
   js/teman.js           Teman Belajar: 4 ilustrasi siswa (img/teman/), rotasi per fitur, gelembung dialog
   img/teman/            Aset karakter dari pengguna (JANGAN diganti/diedit/digabung)
   js/ilustrasi.js       Ilustrasi "3D" SVG: adegan hero, poster episode/misi/games, maskot Ari
@@ -41,11 +42,17 @@ app/                    ROOT WEB: semua yang di-deploy ada di sini
   js/generator.js       Pembuat soal latihan acak
   js/data/materi.js     Konten materi per unit (kartu)
   js/data/literasi.js   Masalah literasi matematika
-  js/views/*.js         Satu file per halaman (beranda, materi, latihan, kuis, literasi, games, saya)
+  js/data/rmt.js        Fondasi RMT: 24 fungsi kognitif, konsep inti, fase, makna per unit
+  js/data/pemanasan.js  RMT Fase I: 6 tugas pola nonangka (Pemanasan Berpikir, #/pemanasan)
+  js/views/*.js         Satu file per halaman (beranda, pretes, pemanasan, materi, latihan, kuis, literasi, games, saya)
   data/bank-soal.json   DIBUAT OLEH python/generate_bank_soal.py (jangan edit manual)
   icons/                DIBUAT OLEH python/buat_ikon.py
+api/tanya.py            Fungsi Python Vercel untuk Teman AI (kelas `handler`), memakai python/api_tanya.py
+vercel.json             Konfigurasi Vercel: app/ statis, fungsi api/tanya.py, header (sw.js tanpa cache)
 python/
   serve.py              Server lokal (MIME benar untuk .js/.webmanifest), tampilkan IP LAN
+  api_tanya.py          Logika POST /api/tanya BERSAMA (dipakai serve.py & api/tanya.py)
+  gemini.py             Penghubung Gemini API (backend, pustaka standar). Kunci dari .env
   generate_bank_soal.py Bank soal kuis + verifikasi kunci jawaban dengan rumus
   buat_ikon.py          Membuat ikon PNG tanpa library eksternal
   buat_data_contoh.py   Data simulasi siswa untuk mencoba analisis
@@ -63,9 +70,66 @@ python python/buat_ikon.py             # buat ulang ikon
 python python/buat_data_contoh.py      # buat 30 data siswa simulasi -> python/data_siswa/
 python python/analisis_statistik.py    # analisis -> python/hasil/
 python -m unittest discover python/tests
+python python/gemini.py --cek          # cek GEMINI_API_KEY di .env (isi kunci tidak dicetak)
+python python/gemini.py "pertanyaan"   # uji satu pertanyaan ke Gemini
 ```
 
 Tidak ada `npm`/Node.js. Jangan menambahkan *bundler* atau *framework*.
+
+## Gemini API (Teman AI)
+
+- API key HANYA di `.env` (root proyek, variabel `GEMINI_API_KEY`); `.env` ada di `.gitignore`.
+  Contoh tanpa kunci: `.env.example`. Jangan pernah menaruh kunci di `app/` (JS/HTML) atau mencetaknya.
+- Gemini hanya dipanggil dari backend Python (`python/gemini.py`), tidak dari browser.
+- **Hosting (docs/09)**: Vercel menyajikan `app/` dan menjalankan `api/tanya.py`. Logika endpoint
+  HANYA di `python/api_tanya.py`; jangan menduplikasi di `serve.py` atau `api/tanya.py`. Di Vercel,
+  rate limit memakai `X-Forwarded-For` (ditimpa Vercel). Kunci di Environment Variables Vercel.
+  Tes `TestApiVercel` menjalankan semua uji endpoint terhadap handler Vercel.
+- Batas waktu Gemini: 12 dtk per model yang masih punya cadangan, 20 dtk untuk model terakhir
+  (kasus terburuk 56 dtk < `maxDuration` 60 di `vercel.json` < 70 dtk tunggu browser).
+- Endpoint: `POST /api/tanya` di `python/serve.py`, isi `{"pertanyaan", "konteks"?, "riwayat"?}`
+  → `{"jawaban"}` atau `{"galat"}`.
+  - `riwayat`: maksimal 8 pesan `{peran: "siswa"|"ai", teks}`, bergantian, diawali "siswa",
+    diakhiri "ai". Divalidasi di `gemini.periksa_riwayat` dan TIDAK disimpan di server.
+  - Batas 16 KB, rate limit (6/menit per IP, 30/menit total), dan penolakan Origin situs lain.
+  - GitHub Pages TIDAK menjalankan endpoint ini (hanya statis).
+- **Teman AI = mediator RMT** (Tahap 1, docs/08). Pola mediasi ada di `INSTRUKSI_DASAR`
+  (`python/gemini.py`):
+  - tidak memberi jawaban akhir;
+  - tepat satu pertanyaan balik;
+  - parafrasa + minta bukti logis;
+  - sebut bagian yang benar & alasannya;
+  - mengapa langkah perlu;
+  - jembatan ke aturan umum;
+  - baris akhir `Fungsi berpikir: <namaSiswa>`.
+  Daftar nama fungsi dibaca dari `app/js/data/rmt.js` (jangan diketik ulang di Python).
+  Ubah instruksi ini hanya bersama tesnya (`TestInstruksiMediator`).
+- **Kuota gratis dihitung per model, per proyek, per hari** (bukan per API key). Contohnya
+  `gemini-3.5-flash` = 20 permintaan/hari, direset tengah malam waktu Pasifik (≈ 15.00 WIB).
+  Cara kerja di `gemini.py`:
+  - **Rantai model** `daftar_model()`: `GEMINI_MODEL` lalu `GEMINI_MODEL_CADANGAN` (bawaan:
+    `gemini-flash-lite-latest, gemini-3.5-flash-lite, gemini-3.1-flash-lite`; isi `tidak` untuk mematikan).
+  - Model berikutnya dicoba bila terjadi 429 (kuota), 503/500 (sibuk), 404 (model dipensiunkan),
+    atau batas waktu habis. 401/403, tanpa internet, dan 400 TIDAK memicu cadangan.
+  - Model yang kuotanya habis diingat di memori sampai `retryDelay` dari Google, jadi tidak
+    dipanggil lagi.
+  - Rincian 429 (`QuotaFailure`, `RetryInfo`) hanya untuk log `[Teman AI]`. Siswa melihat pesan
+    ramah: kuota harian ("bisa dipakai lagi dalam sekitar N jam") atau per menit ("coba lagi dalam N detik").
+  - Server mengembalikan **503 + `Retry-After`**. `js/ai.js` menampilkan hitung mundur di tombol
+    Kirim bila waktu tunggunya ≤ 120 detik.
+  - Instruksi mediator RMT sama untuk semua model.
+  - JANGAN mengaktifkan layanan/penagihan berbayar tanpa izin pengguna.
+- Model Gemini 3.x memakai token "berpikir" di dalam `maxOutputTokens`: dipakai
+  `thinkingLevel: "low"` + batas 4096 (otomatis dicoba tanpa `thinkingConfig` bila model menolak, 400).
+  Jawaban terpotong (`MAX_TOKENS`) ditolak, tidak ditampilkan setengah jadi.
+- Frontend `js/ai.js` (`panelTanyaAI`) dipakai di Latihan:
+  - Tombol hanya muncul bila server AI tersedia.
+  - Percakapan per soal (riwayat direset saat soal berganti atau "Mulai ulang").
+  - Konteks = teks soal + status jawaban yang sudah diperiksa. JANGAN sertakan kunci jawaban.
+  - Jawaban AI ditampilkan dengan `textContent` (bukan `html`).
+  - Label fungsi berpikir hanya tampil bila namanya ada di kamus RMT.
+- Jangan kirim data pribadi siswa (nama, kelas, idPerangkat) ke Gemini; kirim teks pertanyaan/soal saja.
+- Tes `python/tests/test_gemini.py` memakai respons tiruan: tidak butuh internet atau kunci asli.
 
 ## Aturan Desain Wajib (Teori Beban Kognitif)
 
@@ -102,7 +166,7 @@ Setiap fitur atau konten baru harus lolos daftar periksa ini:
 - Setiap halaman daftar diawali `bannerDunia(tema, …)`: materi = Perpustakaan Ajaib,
   latihan = Hutan Latihan, literasi = Kota Cerita, kuis = Arena Juara, games = Taman Bermain.
 - **Ari** (`ari()` di `js/ilustrasi.js`) HANYA pemandu di Beranda: menyambut dan memperkenalkan teman.
-- **Teman Belajar** (`temanBelajar(fitur, pesan)` di `js/teman.js`) menemani di Materi, Latihan, Kuis,
+- **Teman Belajar** (`temanBelajar(fitur, pesan)` di `js/teman.js`) menemani di Pemanasan, Materi, Latihan, Kuis,
   Literasi, Games, dan banner halaman. Rotasi per fitur di `ROTASI`. Ukuran kecil (±72 px di halaman
   belajar, ±82 px di banner). Di halaman belajar pakai `{ tenang: true }` (tanpa melayang) dan letakkan
   di bawah kartu/navigasi, jangan menutupi rumus, teks, atau tombol. Gambar tidak boleh diubah bentuknya.
@@ -117,6 +181,44 @@ Setiap masalah literasi memiliki 4 tahap (kerangka PISA):
 **Memahami** (informasi apa yang diketahui) → **Merumuskan** (model/rumus) →
 **Menghitung** (menerapkan) → **Menafsirkan** (makna jawaban dalam konteks).
 Konteks harus dekat dengan kehidupan siswa Indonesia.
+
+## Aturan RMT (Rigorous Mathematical Thinking)
+
+Model pembelajaran wajib dari dosen. Analisis, rujukan halaman, dan rencana bertahap:
+[docs/08-analisis-rmt.md](docs/08-analisis-rmt.md). Buku sumber ada di `docs/rmt/` (diabaikan git,
+JANGAN di-commit). Rujukan "hlm." = halaman cetak buku (halaman PDF = hlm + 8).
+
+**Daftar periksa RMT.** Setiap fitur/konten belajar baru harus memenuhi KETIGA syarat aktivitas
+belajar matematika (hlm. 2–3, 124):
+
+1. **Perubahan struktural**: membuat siswa memahami lebih dalam, bukan sekadar mengulang prosedur.
+2. **Bagian dari proses membangun konsep**: jelas posisinya di salah satu fase:
+   - Fase I Pengembangan Kognitif (Pemanasan);
+   - Fase II Konten sebagai Proses (Materi);
+   - Fase III Praktik Konstruksi (Latihan, Literasi, Games).
+3. **Bahasa & aturan matematika**: memakai istilah dan notasi baku (a, b, n, Uₙ, Sₙ).
+
+Ditambah, bila relevan:
+
+- **Mediasi MLE** di umpan balik, petunjuk, Teman AI, dan Teman Belajar (hlm. 77–81):
+  - *intensionalitas–resiprositas*: ajak siswa menjawab, bukan hanya diberi tahu;
+  - *makna*: jelaskan mengapa;
+  - *transendensi*: hubungkan ke prinsip umum;
+  - *rasa mampu*: sebut bagian yang sudah benar dan alasannya.
+- **Alat, bukan hanya tampilan** (hlm. 58, 107–109): utamakan siswa memakai atau menyusun tabel
+  dan garis bilangan sendiri, daripada hanya melihat hasil jadi.
+- **Bukti logis & refleksi** (hlm. 8, 87–88, 166): minta alasan ("mengapa?"), dan bila sesuai,
+  sebutkan fungsi kognitif yang dipakai.
+- Nama fungsi kognitif, konsep inti, fase, dan makna unit **hanya** diambil dari `js/data/rmt.js`.
+  Antarmuka memakai `namaSiswa`.
+- **Jangan menyalin** materi *Instrumental Enrichment* (Feuerstein) (hlm. 9). Semua tugas buatan sendiri.
+- Buku tidak membahas AI: Teman AI = **alat bantu mediasi**, guru tetap mediator utama (hlm. 160, 195).
+
+**Selaras dengan Teori Beban Kognitif.**
+- *Kurangi* beban yang tidak perlu: teks berlebih, split-attention, tekanan waktu. Aturan
+  beban kognitif di atas tetap berlaku.
+- *Pertahankan* tantangan bermakna: mendefinisikan masalah, menyusun alat, bukti logis, refleksi.
+- Langkah RMT tambahan tetap satu ide per layar dan tanpa batas waktu.
 
 ## Konvensi Kode
 
@@ -136,18 +238,40 @@ Konteks harus dekat dengan kehidupan siswa Indonesia.
 
 ```json
 {
-  "aplikasi": "DeretKu", "versiData": 1, "diekspor": "ISO-8601",
+  "aplikasi": "DeretKu", "versiData": 3, "diekspor": "ISO-8601",
   "idPerangkat": "string", "profil": {"nama": "", "kelas": ""},
   "materiSelesai": ["u1", "u2"],
-  "latihan": [{"waktu": "", "jenis": "suku-n", "level": 1, "benar": true, "petunjuk": 0, "durasiDetik": 30}],
+  "pretes": [{"waktu": "", "skor": 60, "benar": 3, "total": 5, "durasiDetik": 120,
+              "jawaban": [{"id": "K02", "benar": true, "miskonsepsi": null, "durasiDetik": 20}]}],
+  "pemanasan": [{"waktu": "", "id": "P1", "definisi": true, "benar": true, "fungsiTepat": false}],
+  "latihan": [{"waktu": "", "jenis": "suku-n", "level": 1, "benar": true, "petunjuk": 0, "durasiDetik": 30,
+               "definisiMasalah": true, "bukti": true, "contoh": false, "aiPesan": 0, "lapisanBantuan": 0}],
   "kuis": [{"waktu": "", "skor": 80, "benar": 12, "total": 15, "durasiDetik": 600,
             "jawaban": [{"id": "K01", "benar": true, "miskonsepsi": null, "durasiDetik": 20}]}],
-  "literasi": [{"waktu": "", "id": "L1", "tahap": "Menafsirkan", "benar": true, "percobaan": 1}],
+  "literasi": [{"waktu": "", "id": "L1", "tahap": "Menafsirkan", "benar": true, "percobaan": 1, "tafsiran": "..."}],
+  "jurnal": [{"waktu": "", "konteks": "games:balon", "fungsiKognitif": ["A2", "B1"], "refleksi": "..."}],
   "bebanKognitif": [{"waktu": "", "konteks": "materi:u2", "nilai": 4}]
 }
 ```
 
 Jika mengubah format ini, perbarui kedua sisi dan naikkan `versiData`.
+
+Riwayat versi:
+- **v1**: format awal.
+- **v2** (RMT Tahap 2): `latihan[].definisiMasalah` (bool) dan `latihan[].bukti` (bool, atau `null`
+  bila tidak diminta karena jawaban angka salah dua kali atau sesi ditinggalkan sebelum membuktikan).
+  Python membaca v1 dan v2. Entri tanpa field ini dilewati saat menghitung persentase, bukan
+  dianggap salah.
+- **v3** (RMT Tahap 4–7):
+  - `pretes` (Tes Awal; butirnya = `pretes` di `bank-soal.json`, juga ada di kuis → gain "sandwich");
+  - `pemanasan`;
+  - `jurnal` (Jurnal RMT; `fungsiKognitif` = kode `rmt.js`);
+  - `latihan[].contoh`, `aiPesan`, `lapisanBantuan` (bantuan sebelum jawaban diperiksa);
+  - `literasi[].tafsiran` (hanya tahap Menafsirkan).
+
+  Python membaca v1–v3; laporan §8 "Indikator RMT" ditambah CSV rubrik (`tafsiran_rubrik.csv`,
+  `jurnal_rubrik.csv`, `pretes_postes.csv`). `tafsiran` dan `refleksi` adalah **tulisan bebas
+  siswa**: hanya dikirim ke Gemini bila siswa sendiri bertanya (konteks Teman AI di Literasi).
 
 ## Pengujian
 

@@ -14,6 +14,10 @@ function bawaan() {
     posisiKartu: {},
     levelLatihan: {},
     literasiSelesai: {},
+    pemanasanSelesai: {}, // RMT Fase I (Tahap 4): { P1: true, ... }
+    pemanasan: [],        // [{ waktu, id, definisi, benar, fungsiTepat }] → diekspor mulai versiData 3
+    jurnal: [],           // Jurnal RMT: [{ waktu, konteks, fungsiKognitif: [kode], refleksi }] (Tahap 6–7)
+    pretes: [],           // Tes awal (asesmen dinamis "sandwich"): [{ waktu, skor, benar, total, durasiDetik, jawaban }]
     latihan: [],
     kuis: [],
     literasi: [],
@@ -67,7 +71,20 @@ export function catatPermainan(id, skor) {
   return rekorBaru;
 }
 
+// Jurnal RMT (hlm. 152, 167): refleksi singkat + fungsi berpikir yang dipakai
+export function catatJurnal({ konteks, fungsiKognitif = [], refleksi = '' }) {
+  data.jurnal.push({ waktu: sekarang(), konteks, fungsiKognitif, refleksi: String(refleksi).slice(0, 300) });
+  simpan();
+}
+
+export function catatPemanasan(e) {
+  data.pemanasan.push({ waktu: sekarang(), ...e });
+  data.pemanasanSelesai[e.id] = true;
+  simpan();
+}
+
 export function catatLatihan(e) { data.latihan.push({ waktu: sekarang(), ...e }); simpan(); }
+export function catatPretes(e) { data.pretes.push({ waktu: sekarang(), ...e }); simpan(); }
 export function catatKuis(e) { data.kuis.push({ waktu: sekarang(), ...e }); simpan(); }
 export function catatLiterasi(e) { data.literasi.push({ waktu: sekarang(), ...e }); simpan(); }
 export function catatBeban(konteks, nilai) {
@@ -85,14 +102,19 @@ export function hapusSemua() {
 export function eksporData() {
   return {
     aplikasi: 'DeretKu',
-    versiData: 1,
+    // v2: latihan[].definisiMasalah & bukti (Tahap 2).
+    // v3: pretes, pemanasan, jurnal; latihan[].lapisanBantuan/contoh/aiPesan; literasi[].tafsiran (Tahap 4–7)
+    versiData: 3,
     diekspor: sekarang(),
     idPerangkat: data.idPerangkat,
     profil: data.profil,
     materiSelesai: Object.keys(data.materiSelesai).filter((k) => data.materiSelesai[k]),
+    pretes: data.pretes,
+    pemanasan: data.pemanasan,
     latihan: data.latihan,
     kuis: data.kuis,
     literasi: data.literasi,
+    jurnal: data.jurnal,
     bebanKognitif: data.bebanKognitif,
   };
 }

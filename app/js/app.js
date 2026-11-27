@@ -12,6 +12,9 @@ import * as saya from './views/saya.js';
 import * as games from './views/games.js';
 import * as pemanasan from './views/pemanasan.js';
 import * as pretes from './views/pretes.js';
+import * as akun from './views/akun.js';
+import { tangkapTautanAuth } from './akun.js';
+import { mulaiSinkronOtomatis } from './sinkron.js';
 
 const RUTE = [
   { pola: /^\/$/, view: beranda.tampil, judul: 'DeretKu', tab: 'beranda' },
@@ -27,6 +30,7 @@ const RUTE = [
   { pola: /^\/games$/, view: games.tampilDaftar, judul: 'Games', tab: 'games' },
   { pola: /^\/games\/(\w+)$/, view: games.tampilGame, judul: 'Games', tab: 'games', induk: '#/games' },
   { pola: /^\/saya$/, view: saya.tampil, judul: 'Saya', tab: 'saya' },
+  { pola: /^\/akun$/, view: akun.tampil, judul: 'Akun', tab: 'saya', induk: '#/saya' },
 ];
 
 const main = document.getElementById('app');
@@ -135,7 +139,11 @@ document.documentElement.dataset.animasi = ambil().pengaturan.animasi === false 
 perbaruiTombolMusik();
 saatStatusPasang(() => { if (/^#?\/?$/.test(location.hash)) render(); });
 window.addEventListener('hashchange', render);
+// Tautan konfirmasi email Supabase (#access_token=…) dibaca SEBELUM router, lalu diarahkan ke #/akun
+const tautanAuth = tangkapTautanAuth();
+if (tautanAuth) akun.aturPesanAwal(tautanAuth);
 render();
+mulaiSinkronOtomatis(); // hanya bekerja bila siswa sudah masuk; selain itu diam (local-first)
 
 // ---- service worker (offline + instal)
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(location.hostname))) {

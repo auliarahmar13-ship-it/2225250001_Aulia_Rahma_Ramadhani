@@ -17,6 +17,7 @@ Android/iPhone tanpa Play Store/App Store**.
 | 🧠 Beban kognitif | Skala Paas 1–9 setelah setiap bagian |
 | 🧩 Model RMT | Tes Awal, Pemanasan Berpikir, alat interaktif, "Apa yang ditanyakan?" & "Buktikan", tafsiran tertulis, Jurnal RMT, Kamus Fungsi Berpikir |
 | 🤖 Teman AI | Mediator RMT (Gemini lewat backend Python, model cadangan); butuh server |
+| ☁️ Akun (opsional) | Daftar/masuk dengan email; progres tersinkron antarperangkat lewat Supabase, tetap jalan offline (local-first) |
 | 📊 Python | Bank soal terverifikasi, analisis statistik (deskriptif, butir, KR-20, korelasi) |
 
 ## Bahasa Pemrograman
@@ -60,3 +61,4 @@ Lihat [docs/07-panduan-deploy.md](docs/07-panduan-deploy.md) (GitHub Pages, grat
 - [docs/10-rubrik-rmt.md](docs/10-rubrik-rmt.md): rubrik analitik tulisan siswa (tafsiran & jurnal)
 - [docs/11-panduan-guru-mediator.md](docs/11-panduan-guru-mediator.md): panduan guru sebagai mediator RMT
 - [docs/12-lembar-validasi-ahli.md](docs/12-lembar-validasi-ahli.md): lembar validasi ahli materi, media, dan model RMT
+- [docs/13-rancangan-supabase.md](docs/13-rancangan-supabase.md): rancangan Supabase local-first (tabel, RLS, login, sinkronisasi)

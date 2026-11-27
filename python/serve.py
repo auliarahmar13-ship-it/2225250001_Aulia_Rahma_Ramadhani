@@ -50,12 +50,18 @@ class Handler(ApiTanyaMixin, SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_GET(self) -> None:
+        if self._jalur().rstrip("/") == "/api/konfigurasi":
+            self.layani_konfigurasi()
+            return
         if self._jalur().startswith("/api/"):
             self.tolak_metode()
             return
         super().do_GET()
 
     def do_HEAD(self) -> None:
+        if self._jalur().rstrip("/") == "/api/konfigurasi":
+            self.layani_konfigurasi()
+            return
         if self._jalur().startswith("/api/"):
             self.tolak_metode()
             return
@@ -97,6 +103,8 @@ def main() -> None:
               + (f"; cadangan: {', '.join(urut[1:])})" if len(urut) > 1 else ")"))
     except gemini.GeminiError:
         print("  Teman AI : nonaktif (isi GEMINI_API_KEY di .env)")
+    print("  Akun     : " + ("aktif (Supabase, GET /api/konfigurasi)" if api_tanya.konfigurasi_publik()["supabase"]
+                             else "nonaktif (isi SUPABASE_URL & SUPABASE_PUBLISHABLE_KEY di .env)"))
     print("Tekan Ctrl+C untuk berhenti.")
     if not args.tanpa_browser:
         webbrowser.open(lokal)

@@ -1,5 +1,9 @@
 """
-Logika endpoint Teman AI `POST /api/tanya` yang DIPAKAI BERSAMA oleh:
+Logika endpoint yang DIPAKAI BERSAMA oleh server lokal dan Vercel:
+- `POST /api/tanya` (Teman AI), dan
+- `GET /api/konfigurasi` (URL + kunci PUBLISHABLE Supabase untuk login; hosting Tahap 6, docs/13).
+
+Endpoint Teman AI dipakai oleh:
 - python/serve.py  (server lokal di laptop), dan
 - api/tanya.py     (fungsi Python di Vercel).
 
@@ -13,6 +17,7 @@ siswa tidak dikirim ke Gemini. Hanya pustaka standar.
 
 from __future__ import annotations
 
+import base64
 import json
 import threading
 import time
@@ -69,6 +74,37 @@ class PembatasLaju:
 PEMBATAS = PembatasLaju(MAKS_PER_IP, MAKS_TOTAL)
 
 
+def _peran_jwt(kunci: str) -> str:
+    """Peran di dalam kunci lama berformat JWT (anon / service_role). Tanpa verifikasi tanda tangan."""
+    try:
+        bagian = kunci.split(".")[1]
+        return str(json.loads(base64.urlsafe_b64decode(bagian + "=" * (-len(bagian) % 4))).get("role", ""))
+    except (IndexError, ValueError, AttributeError):
+        return ""
+
+
+def konfigurasi_publik() -> dict:
+    """{"supabase": {"url", "kunci"}} atau {"supabase": None}. HANYA nilai yang memang aman untuk browser.
+
+    Kunci secret (sb_secret_…) atau JWT service_role DITOLAK (tidak pernah dikirim), karena kunci itu
+    melewati RLS. GEMINI_API_KEY tidak pernah disentuh di sini.
+    """
+    url = gemini._ambil("SUPABASE_URL").rstrip("/")
+    kunci = gemini._ambil("SUPABASE_PUBLISHABLE_KEY")
+    bagian = urlsplit(url)
+    url_aman = (bagian.scheme == "https" and bagian.netloc and not bagian.path and not bagian.query) or (
+        bagian.scheme == "http" and bagian.hostname in ("localhost", "127.0.0.1"))  # hanya untuk uji lokal
+    if kunci.startswith("sb_publishable_"):
+        kunci_aman = True
+    elif kunci.count(".") == 2:
+        kunci_aman = _peran_jwt(kunci) == "anon"  # kunci "anon" lama; service_role DITOLAK
+    else:
+        kunci_aman = False
+    if not (url and kunci and url_aman and kunci_aman):
+        return {"supabase": None}
+    return {"supabase": {"url": url, "kunci": kunci}}
+
+
 class GalatApi(Exception):
     def __init__(self, kode: int, pesan: str, header: dict | None = None):
         super().__init__(pesan)
@@ -89,7 +125,19 @@ class ApiTanyaMixin:
     def tolak_metode(self) -> None:
         self._kirim_json(405, {"galat": "Gunakan metode POST."}, {"Allow": "POST"})
 
+    def layani_konfigurasi(self) -> None:
+        """GET /api/konfigurasi → konfigurasi publik Supabase (tanpa rahasia). Metode lain → 405."""
+        if self._jalur().rstrip("/") != "/api/konfigurasi":
+            self._kirim_json(404, {"galat": "Alamat tidak ditemukan."})
+        elif self.command not in ("GET", "HEAD"):
+            self._kirim_json(405, {"galat": "Gunakan metode GET."}, {"Allow": "GET"})
+        else:
+            self._kirim_json(200, konfigurasi_publik())
+
     def layani_tanya(self) -> None:
+        if self._jalur().rstrip("/") == "/api/konfigurasi":
+            self.layani_konfigurasi()  # POST ke konfigurasi → 405
+            return
         if self._jalur().rstrip("/") != "/api/tanya":
             self._kirim_json(404, {"galat": "Alamat tidak ditemukan."})
             return

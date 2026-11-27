@@ -113,6 +113,19 @@ class TestIndikatorRMT(unittest.TestCase):
         self.assertEqual([k for k, _, _ in r["fungsi"]], ["A2", "B1"])
         self.assertEqual(r["fungsi"][0][1], "Membandingkan")  # nama dari rmt.js (sumber tunggal)
 
+    def test_versi4_dengan_id_catatan_hasil_sama(self):
+        """versiData 4 (hosting Tahap 6): `idCatatan` di setiap catatan tidak mengubah hasil analisis."""
+        import copy
+        bank, d3 = self.siswa(pre_benar={"K02"}, post_benar={"K02", "K01", "K04"})
+        d4 = copy.deepcopy(d3)
+        d4["versiData"] = 4
+        for nama in ("pretes", "pemanasan", "latihan", "kuis", "literasi", "jurnal", "bebanKognitif"):
+            for i, e in enumerate(d4.get(nama, [])):
+                e["idCatatan"] = f"00000000-0000-4000-8000-{i:012d}"
+        r3, r4 = an.analisis([d3], bank, "terakhir", 75), an.analisis([d4], bank, "terakhir", 75)
+        self.assertEqual(r3["rmt"], r4["rmt"])
+        self.assertEqual(r4["rmt"]["sandwich"]["gain"], 0.5)
+
     def test_data_lama_tanpa_indikator_rmt(self):
         bank = gb.bangun()
         lama = {"aplikasi": "DeretKu", "versiData": 1, "idPerangkat": "lama", "profil": {}, "kuis": [], "literasi": [],

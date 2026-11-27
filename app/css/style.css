@@ -1080,3 +1080,8 @@ html[data-animasi="mati"] .teman *, html[data-animasi="mati"] .teman, html[data-
   .skala-btn { min-height: 44px; font-size: .9em; }
   .keterangan { grid-template-columns: 1fr; }
 }
+
+/* ---- Akun & sinkronisasi (hosting Tahap 6): formulir sederhana, tanpa animasi */
+.baris-segmen { display: flex; justify-content: center; margin-bottom: 8px; }
+.baris-segmen .segmen button { min-width: 110px; }
+.status-sinkron { background: var(--surface-2); border-radius: 12px; padding: 10px 14px; margin: 10px 0 0; }

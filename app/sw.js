@@ -1,7 +1,7 @@
 // Service worker DeretKu: membuat aplikasi bisa dipasang dan berjalan offline.
 // NAIKKAN CACHE_VERSION setiap kali ada perubahan file di folder app/.
 
-const CACHE_VERSION = 'deretku-v1.12.0';
+const CACHE_VERSION = 'deretku-v1.13.0';
 
 const ASET = [
   './',
@@ -29,6 +29,9 @@ const ASET = [
   'js/views/games.js',
   'js/teman.js',
   'js/ai.js',
+  'js/akun.js',
+  'js/sinkron.js',
+  'js/views/akun.js',
   'img/teman/teman-naik-pensil.jpg',
   'img/teman/teman-membawa-buku.jpg',
   'img/teman/teman-kelompok-smp.jpg',
@@ -60,7 +63,9 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const req = e.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
+  const url = new URL(req.url);
+  // Supabase (domain lain), POST Teman AI, dan GET api/konfigurasi selalu langsung ke jaringan (tidak di-cache)
+  if (req.method !== 'GET' || url.origin !== self.location.origin || url.pathname.includes('/api/')) return;
 
   // Navigasi halaman → selalu index.html dari cache (aplikasi satu halaman)
   if (req.mode === 'navigate') {

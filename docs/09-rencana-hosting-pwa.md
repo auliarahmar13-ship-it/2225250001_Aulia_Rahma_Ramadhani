@@ -66,14 +66,17 @@ Vercel (satu domain HTTPS, mis. https://<proyek>.vercel.app)
 |---|---|---|
 | 1 | Selesaikan RMT Tahap 7–8 (lokal) | ✅ 2026-11-26 |
 | 2 | Backend untuk Vercel (`python/api_tanya.py` bersama, `api/tanya.py`, `vercel.json`), model cadangan lebih cepat, perbaikan PWA | ✅ 2026-11-26 (lokal) |
-| 3 | Commit & push (izin) → hubungkan repositori ke Vercel → isi `GEMINI_API_KEY` → **URL publik** | ⬜ |
+| 3 | Commit & push (izin) → hubungkan repositori ke Vercel → isi `GEMINI_API_KEY` → **URL publik** | ✅ https://deretku.vercel.app (v1.12.0, Teman AI aktif). Catatan: `main` di GitHub belum disamakan dengan branch `deretku-v2-rmt-vercel` |
 | 4 | Uji pasang PWA (Android, iPhone, Windows) & offline di URL publik | ⬜ |
-| 5 | Proyek Supabase + `supabase/skema.sql` (tabel + RLS) + uji dua akun | ⬜ |
-| 6 | Login (opsi diputuskan) + sinkronisasi + migrasi data lokal | ⬜ |
+| 5 | Proyek Supabase + skema (tabel + RLS) + uji dua akun | ✅ 2026-11-27: skema dijalankan di SQL Editor; `uji_rls.sql` → "SEMUA UJI RLS LOLOS"; tabel 0 baris, tanpa akun uji tersisa. Sisa: isi variabel Supabase di Vercel |
+| 6 | Login (opsi diputuskan) + sinkronisasi + migrasi data lokal | 🟡 Email + kata sandi; dibuat & diuji lokal 2026-11-27 (Supabase tiruan, 10 skenario perangkat). Belum commit/deploy |
 | 7 | Teman AI wajib login + audit keamanan | ⬜ |
 | 8 | Dokumentasi & uji menyeluruh | ⬜ |
 
-**Hal yang diverifikasi saat Tahap 3** (belum bisa diuji tanpa deploy):
+**Terverifikasi di Tahap 3** (2026-11-27, situs publik): `includeFiles` diterima (Teman AI menjawab);
+`app/` tersaji tanpa build; header `sw.js` `no-cache` dan `X-Content-Type-Options` aktif.
+
+~~Hal yang diverifikasi saat Tahap 3~~ (selesai):
 - pola `includeFiles` `{python/*.py,app/js/data/rmt.js}` diterima Vercel;
 - `buildCommand: null` + `outputDirectory: "app"` menyajikan `app/` dengan benar.
 

@@ -64,11 +64,11 @@ Rancangan agar selaras RMT dan tidak membuat tampilan rumit:
 
 ### G. Hosting Publik & PWA: Vercel + Supabase (local-first). Audit 2026-11-26 menggantikan rencana Render di `docs/09`
 - [x] Tahap 1: selesaikan RMT Tahap 7–8 (lokal)
-- [ ] Tahap 2: backend Python untuk Vercel (modul API bersama + pembungkus WSGI) + perbaikan PWA (lokal)
-- [ ] Tahap 3: commit & push (dengan persetujuan) → deploy Vercel → URL publik HTTPS
+- [x] Tahap 2: backend Python untuk Vercel (modul API bersama + pembungkus WSGI) + perbaikan PWA (lokal)
+- [x] Tahap 3: commit & push → deploy Vercel → **https://deretku.vercel.app**
 - [ ] Tahap 4: uji instalasi PWA (Android, iPhone, Windows) & offline
-- [ ] Tahap 5: proyek Supabase + skema + RLS, uji dua akun
-- [ ] Tahap 6: login (opsi diputuskan) + sinkronisasi + migrasi data lokal
+- [x] Tahap 5: proyek Supabase + skema + RLS, uji dua akun: LOLOS 2026-11-27 (`supabase/`, `docs/13`)
+- [ ] Tahap 6: login email + kata sandi + sinkronisasi + migrasi data lokal (dibuat & diuji lokal; menunggu uji pengguna, commit, deploy)
 - [ ] Tahap 7: Teman AI wajib login + audit keamanan
 - [ ] Tahap 8: dokumentasi & uji menyeluruh
 - [ ] Setelah itu: XP, pencapaian, kalender (bagian F)

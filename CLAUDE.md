@@ -33,6 +33,8 @@ app/                    ROOT WEB: semua yang di-deploy ada di sini
   js/audio.js           Musik latar generatif, efek suara, narasi (TTS)
   js/ui.js              Helper DOM, toast, modal skala beban kognitif, visual SVG
   js/ai.js              Teman AI: panel tanya di Latihan → POST api/tanya (server). Tanpa API key
+  js/akun.js            Akun Supabase (email + kata sandi) lewat fetch REST, tanpa pustaka; konfigurasi dari GET api/konfigurasi
+  js/sinkron.js         Sinkronisasi local-first: kirim/unduh aktivitas, gabung progres, kepemilikan data per perangkat
   js/teman.js           Teman Belajar: 4 ilustrasi siswa (img/teman/), rotasi per fitur, gelembung dialog
   img/teman/            Aset karakter dari pengguna (JANGAN diganti/diedit/digabung)
   js/ilustrasi.js       Ilustrasi "3D" SVG: adegan hero, poster episode/misi/games, maskot Ari
@@ -44,10 +46,12 @@ app/                    ROOT WEB: semua yang di-deploy ada di sini
   js/data/literasi.js   Masalah literasi matematika
   js/data/rmt.js        Fondasi RMT: 24 fungsi kognitif, konsep inti, fase, makna per unit
   js/data/pemanasan.js  RMT Fase I: 6 tugas pola nonangka (Pemanasan Berpikir, #/pemanasan)
-  js/views/*.js         Satu file per halaman (beranda, pretes, pemanasan, materi, latihan, kuis, literasi, games, saya)
+  js/views/*.js         Satu file per halaman (beranda, pretes, pemanasan, materi, latihan, kuis, literasi, games, saya, akun)
   data/bank-soal.json   DIBUAT OLEH python/generate_bank_soal.py (jangan edit manual)
   icons/                DIBUAT OLEH python/buat_ikon.py
 api/tanya.py            Fungsi Python Vercel untuk Teman AI (kelas `handler`), memakai python/api_tanya.py
+api/konfigurasi.py      Fungsi Vercel GET /api/konfigurasi (URL + kunci publishable Supabase), memakai python/api_tanya.py
+supabase/               SQL Supabase: migrations/ (skema + RLS), uji_rls.sql (selalu ROLLBACK). Rancangan: docs/13
 vercel.json             Konfigurasi Vercel: app/ statis, fungsi api/tanya.py, header (sw.js tanpa cache)
 python/
   serve.py              Server lokal (MIME benar untuk .js/.webmanifest), tampilkan IP LAN
@@ -130,6 +134,29 @@ Tidak ada `npm`/Node.js. Jangan menambahkan *bundler* atau *framework*.
   - Label fungsi berpikir hanya tampil bila namanya ada di kamus RMT.
 - Jangan kirim data pribadi siswa (nama, kelas, idPerangkat) ke Gemini; kirim teks pertanyaan/soal saja.
 - Tes `python/tests/test_gemini.py` memakai respons tiruan: tidak butuh internet atau kunci asli.
+
+## Supabase (local-first, docs/13)
+
+- `localStorage` (lewat `state.js`) tetap sumber utama; Supabase = cadangan + sinkronisasi.
+  **Jangan menghapus data lokal** saat migrasi atau logout.
+- Frontend hanya memakai `SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY` (aman karena RLS). Kunci
+  **secret/service_role tidak pernah** dipakai di frontend, repositori, atau log.
+- Setiap tabel baru WAJIB: RLS aktif, hak `anon` dicabut, policy `to authenticated` dengan
+  `(select auth.uid()) = user_id`. Jangan pernah `or auth.uid() is null` atau `using (true)`.
+  Perbarui `supabase/uji_rls.sql` dan `python/tests/test_supabase.py`.
+- SQL ke database cloud hanya dijalankan pemilik proyek setelah disetujui.
+- **Tahap 6 (login & sinkronisasi)** — `js/akun.js`, `js/sinkron.js`, `#/akun`:
+  - Konfigurasi dari `GET /api/konfigurasi` (`konfigurasi_publik()` di `python/api_tanya.py`), yang
+    MENOLAK `sb_secret_…`/JWT `service_role`. Tidak ada URL proyek atau kunci di `app/`.
+  - Tanpa pustaka luar (fetch ke `/auth/v1` dan `/rest/v1`). Token sesi & konfigurasi disimpan lewat `state.js`.
+  - Setiap catatan riwayat punya `idCatatan` (UUID) = kolom `aktivitas.id`; kirim dengan
+    `resolution=ignore-duplicates` (kiriman ulang tidak menggandakan). JANGAN memakai field `id`
+    (sudah dipakai `pemanasan[].id`, `literasi[].id`).
+  - Progres digabung (`gabungProgres`): selesai = gabungan, level/posisi/rekor = tertinggi, pengaturan = terbaru.
+  - `sinkron.pemilik` = akun pemilik data di perangkat. Data akun lain/tamu **disimpan terpisah**
+    (`pisahkanData`, kunci `deretku:cadangan:<id>`), tidak dihapus, dan dipulihkan saat akun itu masuk lagi.
+  - Keluar hanya menghapus token. Daftar hanya meminta email, kata sandi, nama panggilan, kelas.
+  - Teman AI belum mewajibkan login (Tahap 7).
 
 ## Aturan Desain Wajib (Teori Beban Kognitif)
 
@@ -238,7 +265,7 @@ Ditambah, bila relevan:
 
 ```json
 {
-  "aplikasi": "DeretKu", "versiData": 3, "diekspor": "ISO-8601",
+  "aplikasi": "DeretKu", "versiData": 4, "diekspor": "ISO-8601",
   "idPerangkat": "string", "profil": {"nama": "", "kelas": ""},
   "materiSelesai": ["u1", "u2"],
   "pretes": [{"waktu": "", "skor": 60, "benar": 3, "total": 5, "durasiDetik": 120,
@@ -272,6 +299,9 @@ Riwayat versi:
   Python membaca v1–v3; laporan §8 "Indikator RMT" ditambah CSV rubrik (`tafsiran_rubrik.csv`,
   `jurnal_rubrik.csv`, `pretes_postes.csv`). `tafsiran` dan `refleksi` adalah **tulisan bebas
   siswa**: hanya dikirim ke Gemini bila siswa sendiri bertanya (konteks Teman AI di Literasi).
+- **v4** (hosting Tahap 6): setiap entri di `pretes`, `pemanasan`, `latihan`, `kuis`, `literasi`, `jurnal`,
+  `bebanKognitif` punya `idCatatan` (UUID) untuk sinkronisasi akun. Data lama diberi `idCatatan` saat
+  dimuat (tanpa menghapus apa pun). Python mengabaikan field ini; analisis v1–v4 tetap sama.
 
 ## Pengujian
 

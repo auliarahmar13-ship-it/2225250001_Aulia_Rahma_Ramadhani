@@ -6,6 +6,29 @@ import { LITERASI } from '../data/literasi.js';
 import { bisaPasang, pasang, sudahTerpasang } from '../pasang.js';
 import { TINGKAT, fungsiTingkat, cariFungsi, KETERANGAN_TERJEMAHAN } from '../data/rmt.js';
 import { catatJurnal } from '../state.js';
+import { akunTersedia, penggunaAktif, siapkanKonfig } from '../akun.js';
+import { statusSinkron, saatStatus } from '../sinkron.js';
+import { teksStatus } from './akun.js';
+
+// Kartu Akun (hosting Tahap 6): hanya tampil bila server menyediakan Supabase (bukan di hosting statis)
+function kartuAkun() {
+  const wadah = h('div', {});
+  const isi = () => {
+    const u = penggunaAktif();
+    if (!u && !akunTersedia()) { wadah.replaceChildren(); return; }
+    const surel = h('strong', {});
+    surel.textContent = u ? (u.email || 'akunmu') : '';
+    wadah.replaceChildren(h('section', { class: 'kartu' },
+      h('h2', {}, '☁️ Akun'),
+      u ? h('p', { class: 'kecil' }, 'Masuk sebagai ', surel, '. ', teksStatus(statusSinkron()))
+        : h('p', { class: 'kecil' }, 'Simpan progresmu di cloud agar bisa dibuka di HP atau laptop lain. Tidak wajib.'),
+      h('a', { class: 'btn btn-sekunder lebar', href: '#/akun' }, u ? 'Kelola akun & sinkronisasi' : 'Masuk / Daftar')));
+  };
+  isi();
+  if (!akunTersedia()) siapkanKonfig().then(isi);
+  const lepas = saatStatus(() => { if (wadah.isConnected) isi(); else lepas(); }); // status ikut diperbarui
+  return wadah;
+}
 
 // Jurnal RMT (Tahap 7; hlm. 152, 167): rekap fungsi berpikir + refleksi mandiri. Teks siswa = textContent.
 const LABEL_KONTEKS = { pemanasan: '🧠 Pemanasan', games: '🎮 Games', mandiri: '✍️ Refleksimu' };
@@ -115,12 +138,15 @@ export function tampil(root) {
 
   root.append(
     h('h1', {}, '👤 Saya'),
+    kartuAkun(),
 
     h('section', { class: 'kartu' },
       h('h2', {}, 'Profil'),
       h('label', { class: 'isian' }, h('span', {}, 'Nama'), nama),
       h('label', { class: 'isian' }, h('span', {}, 'Kelas'), kelas),
-      h('p', { class: 'kecil muted' }, 'Opsional. Hanya tersimpan di HP ini, dan ikut terkirim saat kamu mengekspor data ke guru.')),
+      h('p', { class: 'kecil muted' }, penggunaAktif()
+        ? 'Tersimpan di perangkat ini dan di akunmu, dan ikut terkirim saat kamu mengekspor data ke guru.'
+        : 'Opsional. Hanya tersimpan di HP ini, dan ikut terkirim saat kamu mengekspor data ke guru.')),
 
     h('section', { class: 'kartu' },
       h('h2', {}, 'Kemajuanku'),
@@ -164,7 +190,10 @@ export function tampil(root) {
       h('button', {
         class: 'btn btn-bahaya-ghost lebar',
         onclick: async () => {
-          if (await konfirmasi('Hapus semua data?', 'Progres, riwayat latihan, dan kuis akan dihapus dari HP ini. Tindakan ini tidak bisa dibatalkan.', 'Hapus')) {
+          const pesanHapus = penggunaAktif()
+            ? 'Progres, riwayat latihan, dan kuis akan dihapus dari HP ini. Data yang sudah tersinkron di akunmu tetap ada dan diunduh lagi saat sinkronisasi.'
+            : 'Progres, riwayat latihan, dan kuis akan dihapus dari HP ini. Tindakan ini tidak bisa dibatalkan.';
+          if (await konfirmasi('Hapus semua data?', pesanHapus, 'Hapus')) {
             hapusSemua();
             document.documentElement.dataset.teks = 'normal';
             toast('Data dihapus');

@@ -80,6 +80,21 @@ export function konfirmasi(judul, pesan, teksYa = 'Ya') {
   });
 }
 
+// Dua pilihan tanpa tombol "bahaya" (mis. migrasi data akun). Esc/tutup = false (pilihan yang aman).
+export function pilihan(judul, pesan, teksYa, teksTidak) {
+  return new Promise((selesai) => {
+    let tutup;
+    const jawab = (v) => { tutup(); selesai(v); };
+    tutup = modal([
+      h('h2', {}, judul),
+      [].concat(pesan).map((p) => h('p', {}, p)),
+      h('div', { class: 'baris-tombol' },
+        h('button', { class: 'btn btn-sekunder', onclick: () => jawab(false) }, teksTidak),
+        h('button', { class: 'btn btn-utama', onclick: () => jawab(true) }, teksYa)),
+    ], { tutupLuar: false, onTutup: () => selesai(false) });
+  });
+}
+
 // ------------------------------------------------------------------ skala beban kognitif (Paas, 1–9)
 const LABEL_SKALA = ['Sangat-sangat ringan', 'Sangat ringan', 'Ringan', 'Agak ringan', 'Sedang',
   'Agak berat', 'Berat', 'Sangat berat', 'Sangat-sangat berat'];

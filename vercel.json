@@ -7,6 +7,10 @@
     "api/tanya.py": {
       "maxDuration": 60,
       "includeFiles": "{python/*.py,app/js/data/rmt.js}"
+    },
+    "api/konfigurasi.py": {
+      "maxDuration": 10,
+      "includeFiles": "{python/*.py,app/js/data/rmt.js}"
     }
   },
   "headers": [

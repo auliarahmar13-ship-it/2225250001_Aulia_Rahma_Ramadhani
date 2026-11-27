@@ -37,7 +37,13 @@
 | UF30 | Games: layar akhir | Pertanyaan refleksi strategi; tersimpan di Jurnal RMT |
 | UF31 | Saya → Jurnal RMT: tulis refleksi | Rekap fungsi diperbarui; teks tampil apa adanya |
 | UF32 | Teman AI (server menyala) | Bertanya balik, minta bukti, tidak memberi jawaban akhir; pesan kuota ramah |
-| UF33 | Ekspor data → `analisis_statistik.py` | `versiData: 3`; laporan §8 Indikator RMT + CSV rubrik |
+| UF33 | Ekspor data → `analisis_statistik.py` | `versiData: 4` (tiap catatan punya `idCatatan`); laporan §8 Indikator RMT + CSV rubrik |
+| UF34 | Saya → Masuk/Daftar → Daftar (nama panggilan, kelas, email, kata sandi ≥ 8) | Masuk otomatis (bila konfirmasi email mati); halaman Akun tampil; status "Tersinkron" |
+| UF35 | Daftar/masuk di HP yang sudah berisi data | Dialog "Gabungkan / Pisahkan"; pilih Gabungkan → data muncul di Table Editor `aktivitas`; tidak ada data hilang |
+| UF36 | Masuk akun yang sama di perangkat kedua | Progres, riwayat, Jurnal RMT, nama & kelas ikut terunduh |
+| UF37 | Mode pesawat → kerjakan latihan → online lagi | Aplikasi tetap jalan; status "Belum tersambung…"; setelah online catatan terkirim, tanpa duplikat |
+| UF38 | Keluar | Data belajar di perangkat tetap ada; masuk lagi tanpa dialog |
+| UF39 | Akun lain masuk di perangkat yang sama | Data akun sebelumnya disimpan terpisah (tidak hilang) dan kembali saat akun itu masuk lagi |
 
 Uji otomatis: `python -m unittest discover python/tests` (bank soal, statistik, RMT, Gemini tiruan, endpoint API).
 
